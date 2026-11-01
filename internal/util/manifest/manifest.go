@@ -7,14 +7,14 @@ import (
 	"path/filepath"
 	"unicode/utf8"
 
-	"github.com/ProCode-Software/klar/internal/cli"
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
-	"github.com/ProCode-Software/klar/internal/config/glaspack"
-	"github.com/ProCode-Software/klar/internal/lexer"
-	"github.com/ProCode-Software/klar/internal/module"
-	"github.com/ProCode-Software/klar/internal/util"
-	"github.com/ProCode-Software/klar/pkg/klarerrors/reporter"
-	"github.com/ProCode-Software/klar/pkg/klon"
+	"github.com/klarlanguage/klar/internal/cli"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/config/glaspack"
+	"github.com/klarlanguage/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/module"
+	"github.com/klarlanguage/klar/internal/util"
+	"github.com/klarlanguage/klar/pkg/klarerrors/reporter"
+	"github.com/klarlanguage/klar/pkg/klon"
 )
 
 // TODO: Use this functionality in the build package

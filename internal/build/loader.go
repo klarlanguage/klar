@@ -8,11 +8,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ProCode-Software/klar/internal/build/cache"
-	"github.com/ProCode-Software/klar/internal/klarerrs"
-	"github.com/ProCode-Software/klar/internal/module"
-	"github.com/ProCode-Software/klar/internal/module/imports"
-	"github.com/ProCode-Software/klar/internal/util/graph"
+	"github.com/klarlanguage/klar/internal/build/cache"
+	"github.com/klarlanguage/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/internal/module"
+	"github.com/klarlanguage/klar/internal/module/imports"
+	"github.com/klarlanguage/klar/internal/util/graph"
 	"golang.org/x/sync/errgroup"
 )
 

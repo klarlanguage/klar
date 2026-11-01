@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
 )
 
 func Circle(text string, done <-chan struct{}) {

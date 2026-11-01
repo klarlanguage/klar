@@ -7,12 +7,12 @@ import (
 	"slices"
 	"sync"
 
-	"github.com/ProCode-Software/klar/internal/ast"
-	"github.com/ProCode-Software/klar/internal/char"
-	"github.com/ProCode-Software/klar/internal/config/klarbuild"
-	"github.com/ProCode-Software/klar/internal/klarerrs"
-	"github.com/ProCode-Software/klar/internal/target"
-	"github.com/ProCode-Software/klar/internal/version"
+	"github.com/klarlanguage/klar/internal/ast"
+	"github.com/klarlanguage/klar/internal/char"
+	"github.com/klarlanguage/klar/internal/config/klarbuild"
+	"github.com/klarlanguage/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/internal/target"
+	"github.com/klarlanguage/klar/internal/version"
 )
 
 type Checker struct {

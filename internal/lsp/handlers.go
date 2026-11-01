@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/ProCode-Software/klar/internal/cli"
-	"github.com/ProCode-Software/klar/pkg/lsp"
-	"github.com/ProCode-Software/klar/pkg/lsp/rpc"
+	"github.com/klarlanguage/klar/internal/cli"
+	"github.com/klarlanguage/klar/pkg/lsp"
+	"github.com/klarlanguage/klar/pkg/lsp/rpc"
 )
 
 func (s *Server) decodeParams[T any](id rpc.ID, val jsontext.Value) (T, bool) {

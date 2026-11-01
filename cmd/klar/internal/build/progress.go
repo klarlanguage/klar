@@ -3,9 +3,9 @@ package build
 import (
 	"fmt"
 
-	"github.com/ProCode-Software/klar/internal/build"
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
-	"github.com/ProCode-Software/klar/internal/util"
+	"github.com/klarlanguage/klar/internal/build"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/util"
 )
 
 var _ build.Progress = &BuildStatus{}

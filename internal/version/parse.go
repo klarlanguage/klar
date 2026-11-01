@@ -7,7 +7,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/ProCode-Software/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/lexer"
 )
 
 // Parse parses a version literal. An error is returned if the version is invalid.

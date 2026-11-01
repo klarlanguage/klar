@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/ProCode-Software/klar/internal/module/imports"
-	"github.com/ProCode-Software/klar/internal/target"
-	"github.com/ProCode-Software/klar/internal/version"
+	"github.com/klarlanguage/klar/internal/module/imports"
+	"github.com/klarlanguage/klar/internal/target"
+	"github.com/klarlanguage/klar/internal/version"
 )
 
 // A Module describes a Klar module.

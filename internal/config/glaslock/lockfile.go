@@ -3,8 +3,8 @@ package glaslock
 import (
 	"fmt"
 
-	"github.com/ProCode-Software/klar/internal/config/glaspack"
-	"github.com/ProCode-Software/klar/internal/version"
+	"github.com/klarlanguage/klar/internal/config/glaspack"
+	"github.com/klarlanguage/klar/internal/version"
 )
 
 // LockfileVersion is the current version of the lockfile format

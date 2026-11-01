@@ -8,17 +8,17 @@ import (
 	"slices"
 	"time"
 
-	"github.com/ProCode-Software/klar/internal/build"
-	"github.com/ProCode-Software/klar/internal/cli"
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
-	"github.com/ProCode-Software/klar/internal/cli/icons"
-	"github.com/ProCode-Software/klar/internal/config/klarbuild"
-	"github.com/ProCode-Software/klar/internal/klarerrs/jsonerrors"
-	"github.com/ProCode-Software/klar/internal/module"
-	"github.com/ProCode-Software/klar/internal/target"
-	"github.com/ProCode-Software/klar/internal/util"
-	"github.com/ProCode-Software/klar/pkg/argparse"
-	"github.com/ProCode-Software/klar/pkg/klon"
+	"github.com/klarlanguage/klar/internal/build"
+	"github.com/klarlanguage/klar/internal/cli"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/cli/icons"
+	"github.com/klarlanguage/klar/internal/config/klarbuild"
+	"github.com/klarlanguage/klar/internal/klarerrs/jsonerrors"
+	"github.com/klarlanguage/klar/internal/module"
+	"github.com/klarlanguage/klar/internal/target"
+	"github.com/klarlanguage/klar/internal/util"
+	"github.com/klarlanguage/klar/pkg/argparse"
+	"github.com/klarlanguage/klar/pkg/klon"
 )
 
 // Build executes the "klar build" command.

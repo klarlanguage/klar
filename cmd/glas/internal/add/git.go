@@ -14,15 +14,15 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/ProCode-Software/klar/internal/cli"
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
-	"github.com/ProCode-Software/klar/internal/config/glaslock"
-	"github.com/ProCode-Software/klar/internal/config/glaspack"
-	"github.com/ProCode-Software/klar/internal/klarerrs"
-	"github.com/ProCode-Software/klar/internal/module"
-	"github.com/ProCode-Software/klar/internal/pm/git"
-	"github.com/ProCode-Software/klar/internal/util/manifest"
-	"github.com/ProCode-Software/klar/internal/version"
+	"github.com/klarlanguage/klar/internal/cli"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/config/glaslock"
+	"github.com/klarlanguage/klar/internal/config/glaspack"
+	"github.com/klarlanguage/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/internal/module"
+	"github.com/klarlanguage/klar/internal/pm/git"
+	"github.com/klarlanguage/klar/internal/util/manifest"
+	"github.com/klarlanguage/klar/internal/version"
 )
 
 var gitPath string

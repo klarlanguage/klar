@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/ProCode-Software/klar/internal/char"
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/char"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
 )
 
 func (r *Reporter) getFile(name string) *file {

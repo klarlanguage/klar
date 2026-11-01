@@ -1,9 +1,9 @@
 package reporter
 
 import (
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
-	"github.com/ProCode-Software/klar/internal/lexer"
-	"github.com/ProCode-Software/klar/internal/util"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/util"
 )
 
 // makeDefaultTokenColors returns a map of token types to their default colors.

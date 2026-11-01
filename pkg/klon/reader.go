@@ -3,9 +3,9 @@ package klon
 import (
 	"io"
 
-	"github.com/ProCode-Software/klar/internal/lexer"
-	"github.com/ProCode-Software/klar/pkg/klon/ast"
-	"github.com/ProCode-Software/klar/pkg/klon/klonflags"
+	"github.com/klarlanguage/klar/internal/lexer"
+	"github.com/klarlanguage/klar/pkg/klon/ast"
+	"github.com/klarlanguage/klar/pkg/klon/klonflags"
 )
 
 const BufferSize = 64

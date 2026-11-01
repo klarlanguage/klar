@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ProCode-Software/klar/internal/lexer"
-	"github.com/ProCode-Software/klar/internal/parser"
+	"github.com/klarlanguage/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/parser"
 )
 
 // TokenizeFile reads from file and converts it into lexer tokens.

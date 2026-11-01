@@ -17,7 +17,7 @@ for arg in "$@"; do
     --help         Show this help message
     --prebuild     Install a prebuild instead of building from source
 
-https://github.com/ProCode-Software/klar"
+https://github.com/klarlanguage/klar"
         exit 0
         ;;
     -*)
@@ -113,7 +113,7 @@ Please build from source instead by rerunning without the '--prebuild' flag" && 
     fi
 
     progress "📦 Downloading prebuilt Klar and Glas binaries..."
-    release_json=$(curl -s "https://api.github.com/repos/ProCode-Software/klar/releases?per_page=1")
+    release_json=$(curl -s "https://api.github.com/repos/klarlanguage/klar/releases?per_page=1")
     if ! command -v jq &> /dev/null; then
         # Alternative for Windows (Git Bash) users without jq
         tag_name=$(echo "$release_json" | grep -oE '"tag_name":[ ]*"[^"]+"' |
@@ -146,7 +146,7 @@ Please build from source instead by rerunning without the '--prebuild' flag" && 
 
     # Download the standard library
     progress "📚 Downloading the standard library..."
-    curl -fsSL -o "$build_dir/stdlib.zip" "https://github.com/ProCode-Software/klar/releases/download/$tag_name/stdlib.zip"
+    curl -fsSL -o "$build_dir/stdlib.zip" "https://github.com/klarlanguage/klar/releases/download/$tag_name/stdlib.zip"
     unzip -o "$build_dir/stdlib.zip" -d "$build_dir" &> /dev/null
 
     # For the shared stdlib installation step
@@ -166,7 +166,7 @@ build_from_source() {
     # Clone Klar repository
     progress "📖 Cloning Klar repository..."
     set +e
-    err=$(git clone https://github.com/ProCode-Software/klar.git . 2>&1)
+    err=$(git clone https://github.com/klarlanguage/klar.git . 2>&1)
     status=$?
     set -e
     if [[ $status -ne 0 ]]; then
@@ -190,7 +190,7 @@ build_from_source() {
     # Build Klar and Glas executables
     VERSION="0.0.1"
     COMMIT=$(git rev-parse --short HEAD)
-    LDFLAGS=("-X 'github.com/ProCode-Software/klar/internal/cli.Klar"{Version=$VERSION,Commit=$COMMIT}"'")
+    LDFLAGS=("-X 'github.com/klarlanguage/klar/internal/cli.Klar"{Version=$VERSION,Commit=$COMMIT}"'")
 
     get_exec "$GOOS"
     progress "🏗️ Building Klar binary..."
@@ -257,4 +257,4 @@ echo -e "
 \e[1;92m🐨 Klar has been successfully installed!\e[m
 To get started, run \e[96m'klar --help'\e[m. To use Glas, run \e[96m'glas --help'\e[m.
 
-\e[1mGitHub: \e[0;34mhttps://github.com/ProCode-Software/klar\e[m"
+\e[1mGitHub: \e[0;34mhttps://github.com/klarlanguage/klar\e[m"

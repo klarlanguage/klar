@@ -4,8 +4,8 @@ package parser
 import (
 	"slices"
 
-	"github.com/ProCode-Software/klar/internal/klarerrs"
-	"github.com/ProCode-Software/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/internal/lexer"
 )
 
 const (

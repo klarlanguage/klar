@@ -3,8 +3,8 @@ package klon
 import (
 	"fmt"
 
-	"github.com/ProCode-Software/klar/internal/lexer"
-	"github.com/ProCode-Software/klar/internal/ranges"
+	"github.com/klarlanguage/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/ranges"
 )
 
 type TokenType uint8

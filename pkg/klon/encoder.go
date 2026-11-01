@@ -6,7 +6,7 @@ import (
 	"io"
 	"reflect"
 
-	"github.com/ProCode-Software/klar/pkg/klon/klonflags"
+	"github.com/klarlanguage/klar/pkg/klon/klonflags"
 )
 
 var (

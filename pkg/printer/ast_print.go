@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/ProCode-Software/klar/internal/ast"
-	"github.com/ProCode-Software/klar/internal/char"
-	"github.com/ProCode-Software/klar/internal/lexer"
-	"github.com/ProCode-Software/klar/internal/ranges"
+	"github.com/klarlanguage/klar/internal/ast"
+	"github.com/klarlanguage/klar/internal/char"
+	"github.com/klarlanguage/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/ranges"
 )
 
 // PrintNode formats the provided node as it was written in the source.

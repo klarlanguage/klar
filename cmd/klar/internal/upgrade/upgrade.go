@@ -5,7 +5,7 @@
 //
 // Based on: https://github.com/oven-sh/bun/blob/e643d7b085dfd29f675ade275197daedc2cdfc9c/src/cli/upgrade_command.zig
 //
-// [Klar install.sh script]: https://github.com/ProCode-Software/klar/tree/main/install.sh
+// [Klar install.sh script]: https://github.com/klarlanguage/klar/tree/main/install.sh
 package upgrade
 
 import (
@@ -22,21 +22,21 @@ import (
 	"slices"
 	"time"
 
-	"github.com/ProCode-Software/klar/cmd/klar/internal/clean"
-	"github.com/ProCode-Software/klar/internal/cli"
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
-	"github.com/ProCode-Software/klar/internal/module"
-	"github.com/ProCode-Software/klar/internal/util"
-	klarver "github.com/ProCode-Software/klar/internal/version"
-	"github.com/ProCode-Software/klar/pkg/argparse"
+	"github.com/klarlanguage/klar/cmd/klar/internal/clean"
+	"github.com/klarlanguage/klar/internal/cli"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/module"
+	"github.com/klarlanguage/klar/internal/util"
+	klarver "github.com/klarlanguage/klar/internal/version"
+	"github.com/klarlanguage/klar/pkg/argparse"
 )
 
 // The URL to the GitHub API endpoint used for querying Klar releases.
-const ReleasesURL = "https://api.github.com/repos/ProCode-Software/klar/releases"
+const ReleasesURL = "https://api.github.com/repos/klarlanguage/klar/releases"
 
 const (
-	unixInstallCmd    = "curl -fsSL https://raw.githubusercontent.com/ProCode-Software/klar/main/install.sh | bash"
-	windowsInstallCmd = "irm https://raw.githubusercontent.com/ProCode-Software/klar/main/install.ps1 | iex"
+	unixInstallCmd    = "curl -fsSL https://raw.githubusercontent.com/klarlanguage/klar/main/install.sh | bash"
+	windowsInstallCmd = "irm https://raw.githubusercontent.com/klarlanguage/klar/main/install.ps1 | iex"
 )
 
 // The regular expression for Klar release assets published to GitHub.
@@ -78,8 +78,8 @@ func Run(c *argparse.Parser) {
 		ansi.TagPrintfln(
 			"<**><g!>Congrats!</g!> You're already on the latest version of Klar</> (<c>v%s</c>)\n\n"+
 				// TODO: Uncomment once we have numbered versions, and also add link to docs
-				// "Release notes: <m>https://github.com/ProCode-Software/klar/releases/tag/%[1]s</m>"
-				"<y>Release notes:</> <m>https://github.com/ProCode-Software/klar/releases</m>",
+				// "Release notes: <m>https://github.com/klarlanguage/klar/releases/tag/%[1]s</m>"
+				"<y>Release notes:</> <m>https://github.com/klarlanguage/klar/releases</m>",
 			cli.KlarVersionAndCommit,
 		)
 		ok = true
@@ -167,7 +167,7 @@ func Run(c *argparse.Parser) {
 
 const upgradeMessage = `<** g!>Welcome to <c>Klar build %s</c>!</> Upgraded in <b>%s</b>
 
-<y>Release notes:</> <m>https://github.com/ProCode-Software/klar/releases/tag/%s</m>
+<y>Release notes:</> <m>https://github.com/klarlanguage/klar/releases/tag/%s</m>
 <r>Report bugs:</> <m>%s</m>`
 
 func getLatestRelease() *githubRelease {
@@ -238,8 +238,8 @@ func isNewer(rel *githubRelease) (newer bool, versionOrCommit string) {
 func downloadBinaries(rel *githubRelease, dir string) (zipPath string) {
 	// Convert current GOOS to the format used in release assets
 	// To be kept in sync with:
-	// - https://github.com/ProCode-Software/klar/tree/main/install.sh (oses, arches)
-	// - https://github.com/ProCode-Software/klar/tree/main/scripts/build.sh (OS_NAMES, ARCH_NAMES)
+	// - https://github.com/klarlanguage/klar/tree/main/install.sh (oses, arches)
+	// - https://github.com/klarlanguage/klar/tree/main/scripts/build.sh (OS_NAMES, ARCH_NAMES)
 	goosToName := map[string]string{
 		"darwin": "macos", "linux": "linux", "windows": "windows",
 	}
@@ -451,7 +451,7 @@ func regexGroups(re *regexp.Regexp, s string) map[string]string {
 	return res
 }
 
-// See https://api.github.com/repos/ProCode-Software/klar/releases
+// See https://api.github.com/repos/klarlanguage/klar/releases
 type githubRelease struct {
 	TagName     string         `json:"tag_name"`
 	Name        string         `json:"name"`
@@ -477,4 +477,4 @@ const LongDescription = `We frequently release updates to Klar to add new featur
 Note for development versions of Klar: 'klar upgrade' replaces the working Klar version with a prebuild from GitHub. If you don't want this, rebuild the Klar repo from source by syncing your clone and building from source. See instructions in the ` +
 	"\x1b]8;;" + buildFromSourceDocs + "\x1b\\contributing guide\x1b]8;;\x1b\\."
 
-const buildFromSourceDocs = "https://github.com/ProCode-Software/klar/blob/main/CONTRIBUTING.md#development-guide"
+const buildFromSourceDocs = "https://github.com/klarlanguage/klar/blob/main/CONTRIBUTING.md#development-guide"

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"unicode"
 
-	"github.com/ProCode-Software/klar/internal/ast"
+	"github.com/klarlanguage/klar/internal/ast"
 )
 
 // Variable represents a variable type.

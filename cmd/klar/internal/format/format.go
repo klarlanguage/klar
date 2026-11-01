@@ -1,6 +1,6 @@
 package format
 
-import "github.com/ProCode-Software/klar/pkg/argparse"
+import "github.com/klarlanguage/klar/pkg/argparse"
 
 func Run(c *argparse.Parser) {}
 

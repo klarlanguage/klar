@@ -3,10 +3,10 @@ package main
 import (
 	"io"
 
-	"github.com/ProCode-Software/klar/internal/cli"
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
-	"github.com/ProCode-Software/klar/internal/command"
-	"github.com/ProCode-Software/klar/internal/util"
+	"github.com/klarlanguage/klar/internal/cli"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/command"
+	"github.com/klarlanguage/klar/internal/util"
 )
 
 // TODO: Should these be bright?

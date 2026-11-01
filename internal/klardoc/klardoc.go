@@ -4,8 +4,8 @@ import (
 	"maps"
 	"slices"
 
-	"github.com/ProCode-Software/klar/internal/analysis"
-	"github.com/ProCode-Software/klar/internal/ast"
+	"github.com/klarlanguage/klar/internal/analysis"
+	"github.com/klarlanguage/klar/internal/ast"
 )
 
 func GenerateModule(mod *analysis.Module, files map[string]*ast.Program) *Module {

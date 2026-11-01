@@ -5,9 +5,9 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/ProCode-Software/klar/internal/ast"
-	"github.com/ProCode-Software/klar/internal/klarerrs"
-	"github.com/ProCode-Software/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/ast"
+	"github.com/klarlanguage/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/internal/lexer"
 )
 
 // isValidIdentifier reports whether tok's Kind is [lexer.Identifier].

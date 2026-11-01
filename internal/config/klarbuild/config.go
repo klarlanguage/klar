@@ -1,6 +1,6 @@
 package klarbuild
 
-import "github.com/ProCode-Software/klar/internal/target"
+import "github.com/klarlanguage/klar/internal/target"
 
 // TODO: add documentation which will also be added to schema
 

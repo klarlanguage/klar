@@ -6,9 +6,9 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/ProCode-Software/klar/internal/analysis"
-	"github.com/ProCode-Software/klar/internal/ast"
-	"github.com/ProCode-Software/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/analysis"
+	"github.com/klarlanguage/klar/internal/ast"
+	"github.com/klarlanguage/klar/internal/lexer"
 )
 
 // GetTokenColor returns the color for token type k, or an empty

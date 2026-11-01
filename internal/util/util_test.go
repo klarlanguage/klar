@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/ProCode-Software/klar/internal/util"
+	"github.com/klarlanguage/klar/internal/util"
 )
 
 func TestFormatNumber(t *testing.T) {

@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/ProCode-Software/klar/internal/config/glaslock"
-	"github.com/ProCode-Software/klar/internal/config/glaspack"
-	"github.com/ProCode-Software/klar/internal/module/imports"
+	"github.com/klarlanguage/klar/internal/config/glaslock"
+	"github.com/klarlanguage/klar/internal/config/glaspack"
+	"github.com/klarlanguage/klar/internal/module/imports"
 )
 
 type PackageInfo struct {

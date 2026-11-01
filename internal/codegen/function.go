@@ -1,9 +1,9 @@
 package codegen
 
 import (
-	"github.com/ProCode-Software/klar/internal/analysis"
-	"github.com/ProCode-Software/klar/internal/ast"
-	"github.com/ProCode-Software/klar/internal/ir/jsir"
+	"github.com/klarlanguage/klar/internal/analysis"
+	"github.com/klarlanguage/klar/internal/ast"
+	"github.com/klarlanguage/klar/internal/ir/jsir"
 )
 
 func (g *Generator) appendOverloads(dst []jsir.Statement, ovs []*analysis.Overload) []jsir.Statement {

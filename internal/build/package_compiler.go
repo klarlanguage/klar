@@ -5,11 +5,11 @@ import (
 	"log/slog"
 	"path/filepath"
 
-	"github.com/ProCode-Software/klar/internal/build/cache"
-	"github.com/ProCode-Software/klar/internal/cli"
-	"github.com/ProCode-Software/klar/internal/module"
-	"github.com/ProCode-Software/klar/internal/module/imports"
-	"github.com/ProCode-Software/klar/internal/version"
+	"github.com/klarlanguage/klar/internal/build/cache"
+	"github.com/klarlanguage/klar/internal/cli"
+	"github.com/klarlanguage/klar/internal/module"
+	"github.com/klarlanguage/klar/internal/module/imports"
+	"github.com/klarlanguage/klar/internal/version"
 )
 
 type PackageCompiler struct {

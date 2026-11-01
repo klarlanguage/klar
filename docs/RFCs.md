@@ -2,7 +2,7 @@
 
 For some language features, we want extra comments from developers before finalizing syntax and semantics.
 
-Discussions are open on [GitHub](https://github.com/ProCode-Software/klar/discussions) for each RFC below. You may comment and react to other comments on those threads.
+Discussions are open on [GitHub](https://github.com/klarlanguage/klar/discussions) for each RFC below. You may comment and react to other comments on those threads.
 
 Where given, consideration options (listed alphabetically) aren't exhaustive. You may request other options, or comment about or propose changes to existing ideas.
 

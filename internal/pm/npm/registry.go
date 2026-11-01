@@ -3,7 +3,7 @@ package npm
 import (
 	"time"
 
-	"github.com/ProCode-Software/klar/internal/util"
+	"github.com/klarlanguage/klar/internal/util"
 )
 
 type RegistryData struct {

@@ -3,7 +3,7 @@ package codegen
 import (
 	"math/rand/v2"
 
-	"github.com/ProCode-Software/klar/internal/ir/jsir"
+	"github.com/klarlanguage/klar/internal/ir/jsir"
 )
 
 func randomName(n int) string {

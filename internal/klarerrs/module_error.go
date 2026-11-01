@@ -5,7 +5,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/ProCode-Software/klar/internal/module/imports"
+	"github.com/klarlanguage/klar/internal/module/imports"
 )
 
 const (

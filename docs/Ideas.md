@@ -1,6 +1,6 @@
 # Klar Ideas & Plans
 
-Things we may or may not implement. Comments and new ideas are greatly appreciated in [GitHub discussions](https://github.com/ProCode-Software/klar/discussions).
+Things we may or may not implement. Comments and new ideas are greatly appreciated in [GitHub discussions](https://github.com/klarlanguage/klar/discussions).
 
 ## CLI
 

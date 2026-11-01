@@ -1,6 +1,6 @@
 package klardoc
 
-import "github.com/ProCode-Software/klar/internal/ast"
+import "github.com/klarlanguage/klar/internal/ast"
 
 type ProjectKlarDocJSON struct {
 	// From glas.pack

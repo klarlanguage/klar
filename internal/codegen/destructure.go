@@ -3,8 +3,8 @@ package codegen
 import (
 	"fmt"
 
-	"github.com/ProCode-Software/klar/internal/ast"
-	"github.com/ProCode-Software/klar/internal/ir/jsir"
+	"github.com/klarlanguage/klar/internal/ast"
+	"github.com/klarlanguage/klar/internal/ir/jsir"
 )
 
 func (g *Generator) convertDestructure(dest ast.Destructurable, nameMangle bool) jsir.Destructure {

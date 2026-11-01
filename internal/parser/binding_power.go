@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"github.com/ProCode-Software/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/lexer"
 )
 
 // BindingPower represents the operator precedence for a type of operator.

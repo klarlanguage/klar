@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json/v2"
 
-	"github.com/ProCode-Software/klar/pkg/lsp/rpc"
+	"github.com/klarlanguage/klar/pkg/lsp/rpc"
 )
 
 type MessageDirection string

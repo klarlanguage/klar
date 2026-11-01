@@ -6,7 +6,7 @@ import (
 	"slices"
 	"unicode/utf8"
 
-	"github.com/ProCode-Software/klar/internal/char"
+	"github.com/klarlanguage/klar/internal/char"
 )
 
 type TabWriterFlags uint8

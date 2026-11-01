@@ -8,13 +8,13 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/ProCode-Software/klar/internal/analysis"
-	"github.com/ProCode-Software/klar/internal/config/glaslock"
-	"github.com/ProCode-Software/klar/internal/klarerrs"
-	"github.com/ProCode-Software/klar/internal/module"
-	"github.com/ProCode-Software/klar/internal/module/imports"
-	"github.com/ProCode-Software/klar/internal/target"
-	"github.com/ProCode-Software/klar/internal/util/graph"
+	"github.com/klarlanguage/klar/internal/analysis"
+	"github.com/klarlanguage/klar/internal/config/glaslock"
+	"github.com/klarlanguage/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/internal/module"
+	"github.com/klarlanguage/klar/internal/module/imports"
+	"github.com/klarlanguage/klar/internal/target"
+	"github.com/klarlanguage/klar/internal/util/graph"
 )
 
 type ProjectCompiler struct {

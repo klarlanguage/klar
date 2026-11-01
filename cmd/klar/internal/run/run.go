@@ -3,9 +3,9 @@ package run
 import (
 	"os"
 
-	"github.com/ProCode-Software/klar/internal/cli"
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
-	"github.com/ProCode-Software/klar/pkg/argparse"
+	"github.com/klarlanguage/klar/internal/cli"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/pkg/argparse"
 )
 
 func Run(r *argparse.Parser) {

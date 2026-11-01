@@ -6,7 +6,7 @@ export KLAR_STD=$KLAR_DIR/std
 
 VERSION="0.0.1"
 COMMIT=$(git rev-parse --short HEAD)
-LDFLAGS=("-X 'github.com/ProCode-Software/klar/internal/cli.Klar"{Version=$VERSION,Commit=$COMMIT}"'")
+LDFLAGS=("-X 'github.com/klarlanguage/klar/internal/cli.Klar"{Version=$VERSION,Commit=$COMMIT}"'")
 # ldflags: separate with another -X ...
 
 # Generate files

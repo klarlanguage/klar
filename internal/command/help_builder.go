@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/ProCode-Software/klar/internal/cli"
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/cli"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
 )
 
 // A HelpBuilder writes a list of commands and flags to an [io.Writer].

@@ -7,10 +7,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
-	"github.com/ProCode-Software/klar/internal/lexer"
-	"github.com/ProCode-Software/klar/internal/parser"
-	"github.com/ProCode-Software/klar/pkg/printer"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/parser"
+	"github.com/klarlanguage/klar/pkg/printer"
 )
 
 func parseArg(tokens []lexer.Token) (string, bool) {

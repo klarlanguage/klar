@@ -4,7 +4,7 @@ import (
 	"cmp"
 	"fmt"
 
-	"github.com/ProCode-Software/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/internal/klarerrs"
 )
 
 func sortByOrder(a, b *Object) int { return cmp.Compare(a.Order, b.Order) }

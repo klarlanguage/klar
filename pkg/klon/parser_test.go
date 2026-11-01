@@ -3,7 +3,7 @@ package klon
 import (
 	"testing"
 
-	"github.com/ProCode-Software/klar/pkg/klon/ast"
+	"github.com/klarlanguage/klar/pkg/klon/ast"
 )
 
 func TestParser_DashedBlock(t *testing.T) {

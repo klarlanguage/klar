@@ -1,6 +1,6 @@
 package add
 
-import "github.com/ProCode-Software/klar/pkg/argparse"
+import "github.com/klarlanguage/klar/pkg/argparse"
 
 var Flags = argparse.NewParser("[packages...]").
 	ListFlagOf("for", "The subpackages to add the dependency to", "pkgs", argparse.TypeString, nil, nil, "F").

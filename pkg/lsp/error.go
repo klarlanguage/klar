@@ -1,6 +1,6 @@
 package lsp
 
-import "github.com/ProCode-Software/klar/pkg/lsp/rpc"
+import "github.com/klarlanguage/klar/pkg/lsp/rpc"
 
 const (
 	/**

@@ -3,7 +3,7 @@ package command
 import (
 	"os"
 
-	"github.com/ProCode-Software/klar/pkg/argparse"
+	"github.com/klarlanguage/klar/pkg/argparse"
 )
 
 var (

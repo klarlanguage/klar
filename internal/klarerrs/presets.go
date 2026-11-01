@@ -1,10 +1,10 @@
 package klarerrs
 
 import (
-	"github.com/ProCode-Software/klar/internal/ast"
-	"github.com/ProCode-Software/klar/internal/lexer"
-	"github.com/ProCode-Software/klar/internal/module/imports"
-	"github.com/ProCode-Software/klar/internal/ranges"
+	"github.com/klarlanguage/klar/internal/ast"
+	"github.com/klarlanguage/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/module/imports"
+	"github.com/klarlanguage/klar/internal/ranges"
 )
 
 func UnexpectedToken(token lexer.Token) *Error {

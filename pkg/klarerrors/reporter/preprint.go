@@ -7,8 +7,8 @@ import (
 	"slices"
 	"strconv"
 
-	"github.com/ProCode-Software/klar/internal/char"
-	"github.com/ProCode-Software/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/internal/char"
+	"github.com/klarlanguage/klar/internal/klarerrs"
 	"golang.org/x/term"
 )
 

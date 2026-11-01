@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ProCode-Software/klar/internal/cli"
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
-	"github.com/ProCode-Software/klar/internal/util"
-	"github.com/ProCode-Software/klar/pkg/argparse"
+	"github.com/klarlanguage/klar/internal/cli"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/util"
+	"github.com/klarlanguage/klar/pkg/argparse"
 	"golang.org/x/term"
 )
 

@@ -1,6 +1,6 @@
 package main
 
-import "github.com/ProCode-Software/klar/pkg/lsp/rpc"
+import "github.com/klarlanguage/klar/pkg/lsp/rpc"
 
 // Common to all meta model objects
 type BaseDecl struct {

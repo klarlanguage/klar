@@ -5,9 +5,9 @@ package lsp
 import (
 	"os"
 
-	"github.com/ProCode-Software/klar/internal/cli"
-	"github.com/ProCode-Software/klar/internal/util"
-	"github.com/ProCode-Software/klar/pkg/argparse"
+	"github.com/klarlanguage/klar/internal/cli"
+	"github.com/klarlanguage/klar/internal/util"
+	"github.com/klarlanguage/klar/pkg/argparse"
 )
 
 func Main() {

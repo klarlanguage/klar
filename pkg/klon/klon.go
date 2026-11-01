@@ -9,8 +9,8 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/ProCode-Software/klar/pkg/klon/ast"
-	"github.com/ProCode-Software/klar/pkg/klon/klonflags"
+	"github.com/klarlanguage/klar/pkg/klon/ast"
+	"github.com/klarlanguage/klar/pkg/klon/klonflags"
 )
 
 // Unmarshall

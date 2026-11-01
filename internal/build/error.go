@@ -9,15 +9,15 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/ProCode-Software/klar/internal/cli"
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
-	"github.com/ProCode-Software/klar/internal/klarerrs"
-	"github.com/ProCode-Software/klar/internal/lexer"
-	"github.com/ProCode-Software/klar/internal/module"
-	"github.com/ProCode-Software/klar/internal/util"
-	"github.com/ProCode-Software/klar/internal/util/graph"
-	"github.com/ProCode-Software/klar/pkg/klarerrors/reporter"
-	"github.com/ProCode-Software/klar/pkg/klon"
+	"github.com/klarlanguage/klar/internal/cli"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/module"
+	"github.com/klarlanguage/klar/internal/util"
+	"github.com/klarlanguage/klar/internal/util/graph"
+	"github.com/klarlanguage/klar/pkg/klarerrors/reporter"
+	"github.com/klarlanguage/klar/pkg/klon"
 )
 
 type FilesystemError struct {
@@ -157,7 +157,7 @@ func (err *InterfaceError) PrettyError() (main, detail string) {
 	case ErrStdlibNotFound:
 		return "I couldn't find the Klar standard library. Is it installed?", fmt.Sprintf(
 			"\n\nI expected to find it at <c>%s</c>.\n\n"+
-				"Please download <m>stdlib.zip</m> from <m>https://github.com/ProCode-Software/klar/releases</m> and install it to %[1]s.",
+				"Please download <m>stdlib.zip</m> from <m>https://github.com/klarlanguage/klar/releases</m> and install it to %[1]s.",
 			err.Value,
 		)
 	default:

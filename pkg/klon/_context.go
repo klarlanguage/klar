@@ -3,7 +3,7 @@ package klon
 import (
 	"fmt"
 
-	"github.com/ProCode-Software/klar/pkg/klon/ast"
+	"github.com/klarlanguage/klar/pkg/klon/ast"
 )
 
 type Context struct {

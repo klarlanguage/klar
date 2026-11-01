@@ -1,8 +1,8 @@
 package ast
 
 import (
-	"github.com/ProCode-Software/klar/internal/lexer"
-	"github.com/ProCode-Software/klar/internal/ranges"
+	"github.com/klarlanguage/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/ranges"
 )
 
 // Base

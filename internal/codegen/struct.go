@@ -1,8 +1,8 @@
 package codegen
 
 import (
-	"github.com/ProCode-Software/klar/internal/analysis"
-	"github.com/ProCode-Software/klar/internal/ir/jsir"
+	"github.com/klarlanguage/klar/internal/analysis"
+	"github.com/klarlanguage/klar/internal/ir/jsir"
 )
 
 func (g *Generator) convertStruct(o *analysis.Object, str *analysis.Struct) *jsir.ClassDeclaration {

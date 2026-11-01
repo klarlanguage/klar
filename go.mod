@@ -1,4 +1,4 @@
-module github.com/ProCode-Software/klar
+module github.com/klarlanguage/klar
 
 go 1.27.0
 

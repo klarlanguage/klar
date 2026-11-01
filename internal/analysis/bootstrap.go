@@ -1,7 +1,7 @@
 package analysis
 
 import (
-	"github.com/ProCode-Software/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/internal/klarerrs"
 )
 
 // bootstrapType is a type that is used to bootstrap the typechecker.

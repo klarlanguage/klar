@@ -6,9 +6,9 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
-	"github.com/ProCode-Software/klar/internal/cli/icons"
-	"github.com/ProCode-Software/klar/internal/config/glaspack"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/cli/icons"
+	"github.com/klarlanguage/klar/internal/config/glaspack"
 )
 
 type pkgInfo struct {

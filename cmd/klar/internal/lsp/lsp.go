@@ -3,10 +3,10 @@ package lsp
 import (
 	"os"
 
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
-	"github.com/ProCode-Software/klar/internal/lsp"
-	"github.com/ProCode-Software/klar/internal/util"
-	"github.com/ProCode-Software/klar/pkg/argparse"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/lsp"
+	"github.com/klarlanguage/klar/internal/util"
+	"github.com/klarlanguage/klar/pkg/argparse"
 	"golang.org/x/term"
 )
 

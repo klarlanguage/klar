@@ -1,10 +1,10 @@
 package klon
 
 import (
-	"github.com/ProCode-Software/klar/internal/lsp/klarast"
-	"github.com/ProCode-Software/klar/pkg/klon"
-	"github.com/ProCode-Software/klar/pkg/klon/ast"
-	"github.com/ProCode-Software/klar/pkg/lsp"
+	"github.com/klarlanguage/klar/internal/lsp/klarast"
+	"github.com/klarlanguage/klar/pkg/klon"
+	"github.com/klarlanguage/klar/pkg/klon/ast"
+	"github.com/klarlanguage/klar/pkg/lsp"
 )
 
 type Analyzer struct {

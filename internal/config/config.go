@@ -3,9 +3,9 @@ package config
 import (
 	"os"
 
-	"github.com/ProCode-Software/klar/pkg/klon"
-	"github.com/ProCode-Software/klar/pkg/klon/klonerrs"
-	"github.com/ProCode-Software/klar/pkg/klon/klonflags"
+	"github.com/klarlanguage/klar/pkg/klon"
+	"github.com/klarlanguage/klar/pkg/klon/klonerrs"
+	"github.com/klarlanguage/klar/pkg/klon/klonflags"
 )
 
 const DefaultKlonFlags = klonflags.NoUnknownFields

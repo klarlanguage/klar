@@ -1,8 +1,8 @@
 package reporter
 
 import (
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
-	"github.com/ProCode-Software/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/lexer"
 )
 
 type ColorPalette struct {

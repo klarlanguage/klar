@@ -3,7 +3,7 @@ package util
 import (
 	"strings"
 
-	"github.com/ProCode-Software/klar/internal/char"
+	"github.com/klarlanguage/klar/internal/char"
 )
 
 type Wrapper struct {

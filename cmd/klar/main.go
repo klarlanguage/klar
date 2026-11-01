@@ -12,13 +12,13 @@ import (
 	"slices"
 	"time"
 
-	"github.com/ProCode-Software/klar/cmd/glas"
-	"github.com/ProCode-Software/klar/internal/cli"
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
-	"github.com/ProCode-Software/klar/internal/command"
-	"github.com/ProCode-Software/klar/internal/module"
-	"github.com/ProCode-Software/klar/internal/run"
-	"github.com/ProCode-Software/klar/internal/util"
+	"github.com/klarlanguage/klar/cmd/glas"
+	"github.com/klarlanguage/klar/internal/cli"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/command"
+	"github.com/klarlanguage/klar/internal/module"
+	"github.com/klarlanguage/klar/internal/run"
+	"github.com/klarlanguage/klar/internal/util"
 )
 
 func main() {

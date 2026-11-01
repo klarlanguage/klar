@@ -3,9 +3,9 @@ package analysis
 import (
 	"fmt"
 
-	"github.com/ProCode-Software/klar/internal/ast"
-	"github.com/ProCode-Software/klar/internal/klarerrs"
-	"github.com/ProCode-Software/klar/internal/target"
+	"github.com/klarlanguage/klar/internal/ast"
+	"github.com/klarlanguage/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/internal/target"
 )
 
 func (c *Checker) checkTupleLiteral(expr *ast.TupleLiteral, t *Expr) {

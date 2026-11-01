@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/ProCode-Software/klar/internal/klarerrs"
-	"github.com/ProCode-Software/klar/internal/ranges"
-	"github.com/ProCode-Software/klar/pkg/klon/ast"
-	"github.com/ProCode-Software/klar/pkg/klon/klonerrs"
+	"github.com/klarlanguage/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/internal/ranges"
+	"github.com/klarlanguage/klar/pkg/klon/ast"
+	"github.com/klarlanguage/klar/pkg/klon/klonerrs"
 )
 
 // readError is panicked when an error occurs while reading from the input.

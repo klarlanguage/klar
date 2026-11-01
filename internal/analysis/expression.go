@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/ProCode-Software/klar/internal/ast"
-	"github.com/ProCode-Software/klar/internal/config/klarbuild"
-	"github.com/ProCode-Software/klar/internal/klarerrs"
-	"github.com/ProCode-Software/klar/internal/lexer"
-	"github.com/ProCode-Software/klar/internal/ranges"
+	"github.com/klarlanguage/klar/internal/ast"
+	"github.com/klarlanguage/klar/internal/config/klarbuild"
+	"github.com/klarlanguage/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/ranges"
 )
 
 type Expr struct {
@@ -1159,7 +1159,7 @@ func (c *Checker) checkPipelineExpr(expr *ast.PipelineExpression, t *Expr) {
 			continue // Should be the last step
 		}
 		// TODO: Ensure each step is a call, and pass `value` as a param
-		// See RFC #8: https://github.com/ProCode-Software/klar/discussions/11
+		// See RFC #8: https://github.com/klarlanguage/klar/discussions/11
 		e := c.checkExpr(step.(ast.Expression), t.NewChild().withContext(pipelineCtx))
 		valVar.Type = e.Type // Set `value` to the type of the last step
 	}

@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ProCode-Software/klar/internal/cli"
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
-	"github.com/ProCode-Software/klar/internal/cli/prompt"
-	"github.com/ProCode-Software/klar/internal/command"
-	"github.com/ProCode-Software/klar/internal/util"
+	"github.com/klarlanguage/klar/internal/cli"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/cli/prompt"
+	"github.com/klarlanguage/klar/internal/command"
+	"github.com/klarlanguage/klar/internal/util"
 )
 
 func Main(lookupKlarCmd func(string) *command.Command) {

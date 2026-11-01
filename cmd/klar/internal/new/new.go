@@ -1,7 +1,7 @@
 package klarnew
 
 import (
-	"github.com/ProCode-Software/klar/pkg/argparse"
+	"github.com/klarlanguage/klar/pkg/argparse"
 )
 
 type flags uint8

@@ -48,7 +48,7 @@ linters:
       analyze-types: true
       forbid:
         - pattern: ^fmt\.Print
-          pkg: github.com/ProCode-Software/klar/internal/(lexer|parser|analysis)
+          pkg: github.com/klarlanguage/klar/internal/(lexer|parser|analysis)
     staticcheck:
       checks:
         - '-ST1005'

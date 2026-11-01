@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/ProCode-Software/klar/internal/config/glaslock"
-	"github.com/ProCode-Software/klar/internal/config/glaspack"
-	"github.com/ProCode-Software/klar/internal/module"
-	"github.com/ProCode-Software/klar/internal/util/manifest"
-	"github.com/ProCode-Software/klar/internal/version"
+	"github.com/klarlanguage/klar/internal/config/glaslock"
+	"github.com/klarlanguage/klar/internal/config/glaspack"
+	"github.com/klarlanguage/klar/internal/module"
+	"github.com/klarlanguage/klar/internal/util/manifest"
+	"github.com/klarlanguage/klar/internal/version"
 )
 
 type localPackage struct {

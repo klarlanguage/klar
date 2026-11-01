@@ -7,7 +7,7 @@ import (
 	"cmp"
 	"fmt"
 
-	"github.com/ProCode-Software/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/lexer"
 )
 
 // Position is an alias for [lexer.Position]

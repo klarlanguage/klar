@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ProCode-Software/klar/internal/cli"
+	"github.com/klarlanguage/klar/internal/cli"
 )
 
 const expectedDefault = `

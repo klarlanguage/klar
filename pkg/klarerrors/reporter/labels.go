@@ -4,8 +4,8 @@ import (
 	"slices"
 	"unicode/utf8"
 
-	"github.com/ProCode-Software/klar/internal/char"
-	"github.com/ProCode-Software/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/internal/char"
+	"github.com/klarlanguage/klar/internal/klarerrs"
 )
 
 // printUnderlines prints the underlines for the single-line highlights,

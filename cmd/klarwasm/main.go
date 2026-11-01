@@ -9,10 +9,10 @@ import (
 	"syscall/js"
 	"time"
 
-	"github.com/ProCode-Software/klar/internal/build"
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
-	"github.com/ProCode-Software/klar/internal/klarerrs/jsonerrors"
-	"github.com/ProCode-Software/klar/internal/target"
+	"github.com/klarlanguage/klar/internal/build"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/klarerrs/jsonerrors"
+	"github.com/klarlanguage/klar/internal/target"
 )
 
 func main() {

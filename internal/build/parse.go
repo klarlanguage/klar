@@ -9,9 +9,9 @@ import (
 	"os"
 	"sync"
 
-	"github.com/ProCode-Software/klar/internal/lexer"
-	"github.com/ProCode-Software/klar/internal/parser"
-	"github.com/ProCode-Software/klar/internal/util"
+	"github.com/klarlanguage/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/parser"
+	"github.com/klarlanguage/klar/internal/util"
 )
 
 // Compilation stops after exceeding this number of errors.

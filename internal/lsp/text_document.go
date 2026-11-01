@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/ProCode-Software/klar/internal/lsp/klarast"
-	"github.com/ProCode-Software/klar/internal/lsp/klon"
-	"github.com/ProCode-Software/klar/pkg/lsp"
-	"github.com/ProCode-Software/klar/pkg/lsp/rpc"
+	"github.com/klarlanguage/klar/internal/lsp/klarast"
+	"github.com/klarlanguage/klar/internal/lsp/klon"
+	"github.com/klarlanguage/klar/pkg/lsp"
+	"github.com/klarlanguage/klar/pkg/lsp/rpc"
 )
 
 func (s *Server) didOpen(params lsp.DidOpenTextDocumentParams) {

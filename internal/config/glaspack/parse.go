@@ -1,8 +1,8 @@
 package glaspack
 
 import (
-	"github.com/ProCode-Software/klar/internal/config"
-	"github.com/ProCode-Software/klar/pkg/klon"
+	"github.com/klarlanguage/klar/internal/config"
+	"github.com/klarlanguage/klar/pkg/klon"
 )
 
 func Parse(path string) (conf *Manifest, warn []*klon.Error, err error) {

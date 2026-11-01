@@ -6,11 +6,11 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/ProCode-Software/klar/internal/ast"
-	"github.com/ProCode-Software/klar/internal/klarerrs"
-	"github.com/ProCode-Software/klar/internal/module/imports"
-	"github.com/ProCode-Software/klar/internal/ranges"
-	"github.com/ProCode-Software/klar/internal/target"
+	"github.com/klarlanguage/klar/internal/ast"
+	"github.com/klarlanguage/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/internal/module/imports"
+	"github.com/klarlanguage/klar/internal/ranges"
+	"github.com/klarlanguage/klar/internal/target"
 )
 
 // Importer resolves import paths to [Module]s.

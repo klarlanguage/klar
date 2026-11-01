@@ -8,7 +8,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/ProCode-Software/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/lexer"
 )
 
 // QuoteToken add quotes around source code. By default, QuoteToken uses single

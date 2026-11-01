@@ -5,12 +5,12 @@ import (
 	"log/slog"
 	"strings"
 
-	"github.com/ProCode-Software/klar/internal/klarerrs"
-	klonls "github.com/ProCode-Software/klar/internal/lsp/klon"
-	"github.com/ProCode-Software/klar/internal/ranges"
-	"github.com/ProCode-Software/klar/pkg/klon"
-	"github.com/ProCode-Software/klar/pkg/lsp"
-	"github.com/ProCode-Software/klar/pkg/lsp/rpc"
+	"github.com/klarlanguage/klar/internal/klarerrs"
+	klonls "github.com/klarlanguage/klar/internal/lsp/klon"
+	"github.com/klarlanguage/klar/internal/ranges"
+	"github.com/klarlanguage/klar/pkg/klon"
+	"github.com/klarlanguage/klar/pkg/lsp"
+	"github.com/klarlanguage/klar/pkg/lsp/rpc"
 )
 
 func (s *Server) documentDiagnostic(id rpc.ID, params lsp.DocumentDiagnosticParams) {
@@ -140,7 +140,7 @@ func (s *Server) klarErrorToDiagnostic(e *klarerrs.Error) *lsp.Diagnostic {
 	// it is defined in the Klar compiler.
 	if basename, ok := prefixLinks[e.Prefix()]; ok {
 		diag.CodeDescription = &lsp.CodeDescription{
-			Href: "https://github.com/ProCode-Software/klar/tree/main/internal/klarerrs/" +
+			Href: "https://github.com/klarlanguage/klar/tree/main/internal/klarerrs/" +
 				basename + ".go",
 		}
 	}

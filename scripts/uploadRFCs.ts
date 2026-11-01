@@ -40,7 +40,7 @@ staleDiscussions()
 
 async function loadDiscussions(): Promise<{ number: number; title: string }[]> {
     const { discussions } =
-        await $`gh discussion list -R 'ProCode-Software/klar' --json number,title`
+        await $`gh discussion list -R 'klarlanguage/klar' --json number,title`
             .quiet()
             .json()
     return discussions
@@ -70,7 +70,7 @@ async function updateOrCreateDiscussion(rfcNum: number, title: string, body: str
         return
     }
     const { number: discNum } = disc
-    await $`gh discussion edit -R 'ProCode-Software/klar' ${discNum} \
+    await $`gh discussion edit -R 'klarlanguage/klar' ${discNum} \
         -t 'RFC #${rfcNum}: ${title}' -b '${body}'`.quiet()
     // If the content remains the same, GitHub won't show the discussion as updated,
     // so we don't have to worry about re-editing the same content
@@ -79,7 +79,7 @@ async function updateOrCreateDiscussion(rfcNum: number, title: string, body: str
 }
 
 async function createDiscussion(rfcNum: number, title: string, body: string) {
-    await $`gh discussion create -R 'ProCode-Software/klar' -c RFCs \
+    await $`gh discussion create -R 'klarlanguage/klar' -c RFCs \
         -t 'RFC #${rfcNum}: ${title}' -b '${body}'`.quiet()
     addedOrCreated.set(title, true)
 }

@@ -7,8 +7,8 @@ package main
 import (
 	"encoding/json/v2"
 
-	"github.com/ProCode-Software/klar/pkg/klon"
-	"github.com/ProCode-Software/klar/pkg/klon/klonflags"
+	"github.com/klarlanguage/klar/pkg/klon"
+	"github.com/klarlanguage/klar/pkg/klon/klonflags"
 )
 
 func main() {}

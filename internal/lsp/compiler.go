@@ -8,13 +8,13 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/ProCode-Software/klar/internal/build"
-	"github.com/ProCode-Software/klar/internal/klarerrs"
-	"github.com/ProCode-Software/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/build"
+	"github.com/klarlanguage/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/internal/lexer"
 
-	"github.com/ProCode-Software/klar/internal/ranges"
-	"github.com/ProCode-Software/klar/pkg/klon"
-	"github.com/ProCode-Software/klar/pkg/lsp"
+	"github.com/klarlanguage/klar/internal/ranges"
+	"github.com/klarlanguage/klar/pkg/klon"
+	"github.com/klarlanguage/klar/pkg/lsp"
 )
 
 func (s *Server) compileKlarModule(path string) {

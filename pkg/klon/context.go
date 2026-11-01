@@ -1,6 +1,6 @@
 package klon
 
-import "github.com/ProCode-Software/klar/pkg/klon/klonerrs"
+import "github.com/klarlanguage/klar/pkg/klon/klonerrs"
 
 type Context struct {
 	Classes map[string]Class

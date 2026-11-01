@@ -3,7 +3,7 @@ package cli
 import (
 	"os"
 
-	"github.com/ProCode-Software/klar/internal/version"
+	"github.com/klarlanguage/klar/internal/version"
 )
 
 var (
@@ -12,7 +12,7 @@ var (
 )
 
 const (
-	KlarGitHub  = "https://github.com/ProCode-Software/klar"
+	KlarGitHub  = "https://github.com/klarlanguage/klar"
 	KlarIssues  = KlarGitHub + "/issues"
 	KlarWebsite = "https://klarlanguage.github.io"
 )

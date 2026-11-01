@@ -5,10 +5,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ProCode-Software/klar/internal/build"
-	"github.com/ProCode-Software/klar/internal/cli"
-	"github.com/ProCode-Software/klar/internal/klarerrs"
-	"github.com/ProCode-Software/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/build"
+	"github.com/klarlanguage/klar/internal/cli"
+	"github.com/klarlanguage/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/internal/lexer"
 )
 
 func RunString(s, fileName string) (*build.Result, error) {

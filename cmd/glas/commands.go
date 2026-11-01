@@ -1,9 +1,9 @@
 package glas
 
 import (
-	"github.com/ProCode-Software/klar/cmd/glas/internal/add"
-	"github.com/ProCode-Software/klar/cmd/glas/internal/docs"
-	"github.com/ProCode-Software/klar/internal/command"
+	"github.com/klarlanguage/klar/cmd/glas/internal/add"
+	"github.com/klarlanguage/klar/cmd/glas/internal/docs"
+	"github.com/klarlanguage/klar/internal/command"
 )
 
 var Commands = map[string]*command.Command{
@@ -17,7 +17,7 @@ var Commands = map[string]*command.Command{
 		Flags:            add.Flags,
 		LongDescription:  add.LongDescription,
 		Examples: []command.ExampleCmd{
-			{"add", s{"github.com/ProCode-Software/klar"}, nil, "Install a package from GitHub (or any other Git repository)"},
+			{"add", s{"github.com/klarlanguage/klar"}, nil, "Install a package from GitHub (or any other Git repository)"},
 			{"add", s{"proicons"}, s{"--npm"}, "Install 'proicons' from NPM"},
 			{"add", s{"../greeter"}, nil, "Install a package stored locally"},
 			{"add", s{"./pkg/server"}, nil, "Install a package from your project"},

@@ -2,8 +2,8 @@
 package glaspack
 
 import (
-	"github.com/ProCode-Software/klar/internal/target"
-	"github.com/ProCode-Software/klar/internal/version"
+	"github.com/klarlanguage/klar/internal/target"
+	"github.com/klarlanguage/klar/internal/version"
 )
 
 type Manifest struct {

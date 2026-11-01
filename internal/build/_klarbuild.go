@@ -1,8 +1,8 @@
 package build
 
 import (
-	"github.com/ProCode-Software/klar/internal/config/klarbuild"
-	"github.com/ProCode-Software/klar/pkg/klon"
+	"github.com/klarlanguage/klar/internal/config/klarbuild"
+	"github.com/klarlanguage/klar/pkg/klon"
 )
 
 // ReadKlarBuild reads a 'klar.build' file at path and returns the configurations

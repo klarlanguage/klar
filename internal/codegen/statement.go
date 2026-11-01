@@ -1,10 +1,10 @@
 package codegen
 
 import (
-	"github.com/ProCode-Software/klar/internal/analysis"
-	"github.com/ProCode-Software/klar/internal/ast"
-	"github.com/ProCode-Software/klar/internal/ir/jsir"
-	"github.com/ProCode-Software/klar/internal/lexer"
+	"github.com/klarlanguage/klar/internal/analysis"
+	"github.com/klarlanguage/klar/internal/ast"
+	"github.com/klarlanguage/klar/internal/ir/jsir"
+	"github.com/klarlanguage/klar/internal/lexer"
 )
 
 func (g *Generator) convertStatement(stmt ast.Statement, ctx *analysis.Context) jsir.Statement {

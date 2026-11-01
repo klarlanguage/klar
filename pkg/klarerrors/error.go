@@ -2,7 +2,7 @@
 // by the Klar compiler and runtime.
 package klarerrors
 
-import "github.com/ProCode-Software/klar/internal/klarerrs"
+import "github.com/klarlanguage/klar/internal/klarerrs"
 
 // IsCompileError returns true if err is not nil and any Klar compiler error.
 func IsCompileError(err error) bool {

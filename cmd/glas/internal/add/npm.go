@@ -8,13 +8,13 @@ import (
 	"os"
 	"time"
 
-	"github.com/ProCode-Software/klar/internal/cli"
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
-	"github.com/ProCode-Software/klar/internal/config/glaslock"
-	"github.com/ProCode-Software/klar/internal/klarerrs"
-	"github.com/ProCode-Software/klar/internal/pm/npm"
-	"github.com/ProCode-Software/klar/internal/util"
-	"github.com/ProCode-Software/klar/internal/version"
+	"github.com/klarlanguage/klar/internal/cli"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/config/glaslock"
+	"github.com/klarlanguage/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/internal/pm/npm"
+	"github.com/klarlanguage/klar/internal/util"
+	"github.com/klarlanguage/klar/internal/version"
 )
 
 var npmRegistry = glaslock.DefaultNPMRegistry

@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ProCode-Software/klar/pkg/klon/ast"
-	"github.com/ProCode-Software/klar/pkg/klon/klonerrs"
+	"github.com/klarlanguage/klar/pkg/klon/ast"
+	"github.com/klarlanguage/klar/pkg/klon/klonerrs"
 )
 
 func TestDecodePrimitive(t *testing.T) {

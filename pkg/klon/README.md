@@ -17,7 +17,7 @@ Klon is designed to be a user-friendly configuration language, therefore it has 
 
 ## Examples
 
-See [../../samples/basic/all.klon](https://github.com/ProCode-Software/klar/tree/main/samples/basic/all.klon) for an example of all Klon syntax.
+See [../../samples/basic/all.klon](https://github.com/klarlanguage/klar/tree/main/samples/basic/all.klon) for an example of all Klon syntax.
 
 ## Future Work
 

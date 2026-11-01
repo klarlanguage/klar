@@ -75,7 +75,7 @@ As this project is still in early development, **do not file bug reports on unim
 Examples of incomplete features you shouldn't report bugs on:
 
 - The type checker
-- Incomplete features from the [roadmap](https://github.com/ProCode-Software/klar/tree/main/ROADMAP.md)
+- Incomplete features from the [roadmap](https://github.com/klarlanguage/klar/tree/main/ROADMAP.md)
 - Stubs, placeholders, and code with TODO comments
 
 Examples of complete features you can report bugs on:

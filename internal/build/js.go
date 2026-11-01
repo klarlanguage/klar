@@ -7,9 +7,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ProCode-Software/klar/internal/codegen"
-	"github.com/ProCode-Software/klar/internal/codegen/jswriter"
-	"github.com/ProCode-Software/klar/internal/module"
+	"github.com/klarlanguage/klar/internal/codegen"
+	"github.com/klarlanguage/klar/internal/codegen/jswriter"
+	"github.com/klarlanguage/klar/internal/module"
 	"golang.org/x/sync/errgroup"
 )
 

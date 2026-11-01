@@ -24,7 +24,7 @@ func GetASTNodes() ([]*types.TypeName, *types.Package, error) {
 		Mode: packages.NeedName | packages.NeedTypes | packages.NeedTypesInfo | packages.NeedSyntax | packages.NeedImports | packages.NeedDeps,
 	}
 
-	pkgs, err := packages.Load(cfg, "github.com/ProCode-Software/klar/internal/ast")
+	pkgs, err := packages.Load(cfg, "github.com/klarlanguage/klar/internal/ast")
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to load package: %v", err)
 	}

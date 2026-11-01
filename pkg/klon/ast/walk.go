@@ -2,7 +2,7 @@ package ast
 
 type VisitFunc func(n Node, depth int) StopCode
 
-// StopCode copied from https://github.com/ProCode-Software/klar/blob/main/internal/ast/walk.go
+// StopCode copied from https://github.com/klarlanguage/klar/blob/main/internal/ast/walk.go
 
 // StopCode is a code that is returned by a visitor to control the walk.
 type StopCode int

@@ -4,8 +4,8 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/ProCode-Software/klar/internal/ast"
-	"github.com/ProCode-Software/klar/pkg/lsp"
+	"github.com/klarlanguage/klar/internal/ast"
+	"github.com/klarlanguage/klar/pkg/lsp"
 )
 
 var HexColorRegex = regexp.MustCompile(`#[0-9a-fA-F]{3,8}`)

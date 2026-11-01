@@ -3,7 +3,7 @@ package jswriter
 import (
 	"fmt"
 
-	"github.com/ProCode-Software/klar/internal/ir/jsir"
+	"github.com/klarlanguage/klar/internal/ir/jsir"
 )
 
 // A newline isn't appended.

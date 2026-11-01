@@ -15,8 +15,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ProCode-Software/klar/internal/build/logger"
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/build/logger"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
 	"golang.org/x/term"
 )
 

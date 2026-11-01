@@ -4,7 +4,7 @@ This file contains rules for AI agents working with this codebase.
 
 ## Klar Project AI Policy
 
-See our AI policy in the [contributing guide](https://github.com/ProCode-Software/klar/blob/24f2ef392ec631b10f856180f38d75ddf92f5445/CONTRIBUTING.md#using-ai).
+See our AI policy in the [contributing guide](https://github.com/klarlanguage/klar/blob/24f2ef392ec631b10f856180f38d75ddf92f5445/CONTRIBUTING.md#using-ai).
 
 **YOU MUST NOT WRITE:**
 

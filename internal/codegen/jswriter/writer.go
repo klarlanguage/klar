@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/ProCode-Software/klar/internal/char"
-	"github.com/ProCode-Software/klar/internal/ir/jsir"
+	"github.com/klarlanguage/klar/internal/char"
+	"github.com/klarlanguage/klar/internal/ir/jsir"
 )
 
 type Writer struct {

@@ -21,7 +21,7 @@ Flags:
     -Prebuild     Install a prebuilt binary instead of building from source
     -Help         Show this help message
 
-https://github.com/ProCode-Software/klar
+https://github.com/klarlanguage/klar
 '@ | Write-Host
     return
 }
@@ -107,7 +107,7 @@ function Invoke-DownloadPrebuild {
         throw 'KlarInstallAborted'
     }
 
-    $releases = Invoke-RestMethod -Uri 'https://api.github.com/repos/ProCode-Software/klar/releases?per_page=1' `
+    $releases = Invoke-RestMethod -Uri 'https://api.github.com/repos/klarlanguage/klar/releases?per_page=1' `
         -Headers @{ 'User-Agent' = 'klar-installer' }
     if (-not $releases -or $releases.Count -eq 0) {
         Write-Red "Unfortunately, we couldn't find any Klar releases on GitHub.`nPlease build from source instead by rerunning without '-Prebuild'."
@@ -129,7 +129,7 @@ function Invoke-DownloadPrebuild {
     # Download the standard library
     Write-Status '📚 Downloading the standard library...'
     $stdlibZip = Join-Path $buildDir 'stdlib.zip'
-    Invoke-WebRequest -Uri "https://github.com/ProCode-Software/klar/releases/download/$tagName/stdlib.zip" `
+    Invoke-WebRequest -Uri "https://github.com/klarlanguage/klar/releases/download/$tagName/stdlib.zip" `
         -OutFile $stdlibZip -UseBasicParsing
     Expand-Archive -Path $stdlibZip -DestinationPath $buildDir -Force
 }
@@ -147,7 +147,7 @@ function Invoke-BuildFromSource {
 
     # Clone Klar repository
     Write-Status '📖 Cloning Klar repository...'
-    $cloneOutput = & git clone https://github.com/ProCode-Software/klar.git . 2>&1
+    $cloneOutput = & git clone https://github.com/klarlanguage/klar.git . 2>&1
     if ($LASTEXITCODE -ne 0) {
         Write-Red 'Failed to clone Klar repository. The error was:'
         $cloneOutput | ForEach-Object { Write-Host $_ }
@@ -169,7 +169,7 @@ function Invoke-BuildFromSource {
     # Build Klar and Glas executables
     $version = '0.0.1'
     $commit = (& git rev-parse --short HEAD).Trim()
-    $ldflags = "-X 'github.com/ProCode-Software/klar/internal/cli.KlarVersion=$version' -X 'github.com/ProCode-Software/klar/internal/cli.KlarCommit=$commit'"
+    $ldflags = "-X 'github.com/klarlanguage/klar/internal/cli.KlarVersion=$version' -X 'github.com/klarlanguage/klar/internal/cli.KlarCommit=$commit'"
 
     Write-Status '🏗️ Building Klar binary...'
     & go generate ./...
@@ -241,7 +241,7 @@ try {
     Write-Host '🐨 Klar has been successfully installed!' -ForegroundColor Green
     Write-Host "To get started, run 'klar --help'. To use Glas, run 'glas --help'."
     Write-Host ''
-    Write-Host 'GitHub: https://github.com/ProCode-Software/klar' -ForegroundColor Blue
+    Write-Host 'GitHub: https://github.com/klarlanguage/klar' -ForegroundColor Blue
 }
 catch {
     if ($_.Exception.Message -ne 'KlarInstallAborted') {

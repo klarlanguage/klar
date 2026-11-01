@@ -1,10 +1,10 @@
 package analysis
 
 import (
-	"github.com/ProCode-Software/klar/internal/ast"
-	"github.com/ProCode-Software/klar/internal/ir/jsir"
-	"github.com/ProCode-Software/klar/internal/klarerrs"
-	"github.com/ProCode-Software/klar/internal/target"
+	"github.com/klarlanguage/klar/internal/ast"
+	"github.com/klarlanguage/klar/internal/ir/jsir"
+	"github.com/klarlanguage/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/internal/target"
 )
 
 func (c *Checker) checkFunctionImpls(ov *Overload, stmt *ast.FunctionDeclaration) {

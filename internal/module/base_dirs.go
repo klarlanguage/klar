@@ -4,7 +4,7 @@ import "path/filepath"
 
 // Directories in the root of a package or project, as defined by the [Klar Project Structure Spec].
 //
-// [Klar Project Structure Spec]: https://github.com/ProCode-Software/klar/tree/main/docs/ProjectStructure.md
+// [Klar Project Structure Spec]: https://github.com/klarlanguage/klar/tree/main/docs/ProjectStructure.md
 var KlarPackageDirs = map[string]struct{}{
 	".klar": {}, "src": {}, "cmd": {}, "shared": {}, "external": {}, "pkg": {},
 	"recipes": {}, "scripts": {}, "generated": {}, "dist": {}, "docs": {},

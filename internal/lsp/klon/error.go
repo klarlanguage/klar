@@ -3,11 +3,11 @@ package klon
 import (
 	"regexp"
 
-	"github.com/ProCode-Software/klar/internal/ranges"
-	"github.com/ProCode-Software/klar/pkg/klon"
-	"github.com/ProCode-Software/klar/pkg/klon/ast"
-	"github.com/ProCode-Software/klar/pkg/klon/klonerrs"
-	"github.com/ProCode-Software/klar/pkg/lsp"
+	"github.com/klarlanguage/klar/internal/ranges"
+	"github.com/klarlanguage/klar/pkg/klon"
+	"github.com/klarlanguage/klar/pkg/klon/ast"
+	"github.com/klarlanguage/klar/pkg/klon/klonerrs"
+	"github.com/klarlanguage/klar/pkg/lsp"
 )
 
 var varAlreadyDeclaredRegex = regexp.MustCompile(`^Variable '(.+)' was already declared`)

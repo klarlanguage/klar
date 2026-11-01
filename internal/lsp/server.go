@@ -9,10 +9,10 @@ import (
 	"log/slog"
 	"slices"
 
-	"github.com/ProCode-Software/klar/internal/build"
-	"github.com/ProCode-Software/klar/internal/cli"
-	"github.com/ProCode-Software/klar/pkg/lsp"
-	"github.com/ProCode-Software/klar/pkg/lsp/rpc"
+	"github.com/klarlanguage/klar/internal/build"
+	"github.com/klarlanguage/klar/internal/cli"
+	"github.com/klarlanguage/klar/pkg/lsp"
+	"github.com/klarlanguage/klar/pkg/lsp/rpc"
 )
 
 type Server struct {

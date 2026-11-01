@@ -14,7 +14,7 @@
         "env": { "KLAR_STD": "${ZED_WORKTREE_ROOT}/std" },
         "buildFlags": [
             "--ldflags",
-            "-X 'github.com/ProCode-Software/klar/internal/cli.KlarVersion=0.0.1'"
+            "-X 'github.com/klarlanguage/klar/internal/cli.KlarVersion=0.0.1'"
         ],
         "mode": "debug"
     },

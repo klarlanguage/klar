@@ -1,18 +1,18 @@
 package main
 
 import (
-	"github.com/ProCode-Software/klar/cmd/klar/internal/build"
-	"github.com/ProCode-Software/klar/cmd/klar/internal/clean"
-	"github.com/ProCode-Software/klar/cmd/klar/internal/format"
-	"github.com/ProCode-Software/klar/cmd/klar/internal/help"
-	"github.com/ProCode-Software/klar/cmd/klar/internal/lint"
-	"github.com/ProCode-Software/klar/cmd/klar/internal/lsp"
-	klarnew "github.com/ProCode-Software/klar/cmd/klar/internal/new"
-	"github.com/ProCode-Software/klar/cmd/klar/internal/repl"
-	"github.com/ProCode-Software/klar/cmd/klar/internal/run"
-	"github.com/ProCode-Software/klar/cmd/klar/internal/upgrade"
-	"github.com/ProCode-Software/klar/cmd/klar/internal/zen"
-	"github.com/ProCode-Software/klar/internal/command"
+	"github.com/klarlanguage/klar/cmd/klar/internal/build"
+	"github.com/klarlanguage/klar/cmd/klar/internal/clean"
+	"github.com/klarlanguage/klar/cmd/klar/internal/format"
+	"github.com/klarlanguage/klar/cmd/klar/internal/help"
+	"github.com/klarlanguage/klar/cmd/klar/internal/lint"
+	"github.com/klarlanguage/klar/cmd/klar/internal/lsp"
+	klarnew "github.com/klarlanguage/klar/cmd/klar/internal/new"
+	"github.com/klarlanguage/klar/cmd/klar/internal/repl"
+	"github.com/klarlanguage/klar/cmd/klar/internal/run"
+	"github.com/klarlanguage/klar/cmd/klar/internal/upgrade"
+	"github.com/klarlanguage/klar/cmd/klar/internal/zen"
+	"github.com/klarlanguage/klar/internal/command"
 )
 
 var Commands = map[string]*command.Command{

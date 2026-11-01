@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/ProCode-Software/klar/pkg/klon/klonflags"
+	"github.com/klarlanguage/klar/pkg/klon/klonflags"
 )
 
 func (e *encoder) makeDefaultEncoder(rt reflect.Type) encodeFunc {

@@ -1,9 +1,9 @@
 package build
 
 import (
-	"github.com/ProCode-Software/klar/internal/config/klarbuild"
-	"github.com/ProCode-Software/klar/internal/target"
-	"github.com/ProCode-Software/klar/pkg/argparse"
+	"github.com/klarlanguage/klar/internal/config/klarbuild"
+	"github.com/klarlanguage/klar/internal/target"
+	"github.com/klarlanguage/klar/pkg/argparse"
 )
 
 var Flags = argparse.NewParser("[inputs...]").

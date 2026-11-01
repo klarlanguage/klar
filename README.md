@@ -1,7 +1,7 @@
 # Klar 🐨
 
-<img src="https://raw.githubusercontent.com/ProCode-Software/klar/main/.github/banner-light.png#gh-light-mode-only" alt="Banner">
-<img src="https://raw.githubusercontent.com/ProCode-Software/klar/main/.github/banner-dark.png#gh-dark-mode-only" alt="Banner">
+<img src="https://raw.githubusercontent.com/klarlanguage/klar/main/.github/banner-light.png#gh-light-mode-only" alt="Banner">
+<img src="https://raw.githubusercontent.com/klarlanguage/klar/main/.github/banner-dark.png#gh-dark-mode-only" alt="Banner">
 
 Klar is Danish for _clear_. In Klar, if you read code, that's what it does, with no hidden behavior.
 
@@ -38,24 +38,24 @@ To get started with Klar, run the installer with the following command:
 **Linux/macOS:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/ProCode-Software/klar/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/klarlanguage/klar/main/install.sh | bash
 ```
 
 **Windows:**
 
 ```powershell
-irm https://raw.githubusercontent.com/ProCode-Software/klar/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/klarlanguage/klar/main/install.ps1 | iex
 ```
 
 The installer gives you two options on how to install Klar:
 
 1. **Build from source**, which builds Klar directly from the latest commits on the main branch. This requires Git and the [Go](https://go.dev/) toolchain to be installed.
-2. **Download a prebuilt binary**, which doesn't require Go or Git to be installed. Note that prebuilt binaries are built occasionally and won't have the latest features and bug fixes. They are more stable than the main branch. The installer will automatically download the appropriate binary from the [releases page](https://github.com/ProCode-Software/klar/releases).
+2. **Download a prebuilt binary**, which doesn't require Go or Git to be installed. Note that prebuilt binaries are built occasionally and won't have the latest features and bug fixes. They are more stable than the main branch. The installer will automatically download the appropriate binary from the [releases page](https://github.com/klarlanguage/klar/releases).
 
 <details>
     <summary><b>Manual prebuild installation</b></summary>
 
-1. Download the prebuild bundle (starts with _klar_) for your platform from the [releases page](https://github.com/ProCode-Software/klar/releases).
+1. Download the prebuild bundle (starts with _klar_) for your platform from the [releases page](https://github.com/klarlanguage/klar/releases).
 2. From the same page, download a copy of the standard library (`stdlib.zip`).
 3. Extract the prebuild bundle and standard library to any directory
 4. Set the `$KLAR_STD` environment variable to that path. It should point to the unzipped directory named `std` (not `stdlib` or `std/src/std`).
@@ -82,14 +82,14 @@ glas --help  # Use Glas, the Klar package manager
 
 ## Examples
 
-Many examples are available in the [samples](https://github.com/ProCode-Software/klar/tree/main/samples) folder. To compile them, run `klar build <file/folder>`
+Many examples are available in the [samples](https://github.com/klarlanguage/klar/tree/main/samples) folder. To compile them, run `klar build <file/folder>`
 
-- The [`mylang`](https://github.com/ProCode-Software/klar/tree/main/samples/mylang) subfolder contains a full Klar project and a simple programming language written in Klar. This is the reference we use to test the compiler.
-- [`samples/basic/all.klar`](https://github.com/ProCode-Software/klar/blob/main/samples/basic/all.klar) shows all syntax features in the language.
-- [`samples/basic/main.klar`](https://github.com/ProCode-Software/klar/blob/main/samples/basic/main.klar) is an invalid program that will display errors from the typechecker.
-- [`samples/basic/all.klon`](https://github.com/ProCode-Software/klar/blob/main/samples/basic/all.klon) shows all the syntax features in Klon (_**Kl**ar **O**bject **N**otation_), Klar's homegrown markup format. The Glas manifest `glas.pack` and the Klar build file `klar.build` are also written in Klon.
-- [`samples/basic/Person.klar`](https://github.com/ProCode-Software/klar/blob/main/samples/basic/Person.klar) compares the Klar syntax to Swift's in `samples/basic/Person.swift`.
-- [`samples/basic/theOG.klar`](https://github.com/ProCode-Software/klar/blob/main/samples/basic/theOG.klar) shows the original program when Klar was first planned. The syntax used in the file has changed since Klar was originally planned, but the changes are documented in the file.
+- The [`mylang`](https://github.com/klarlanguage/klar/tree/main/samples/mylang) subfolder contains a full Klar project and a simple programming language written in Klar. This is the reference we use to test the compiler.
+- [`samples/basic/all.klar`](https://github.com/klarlanguage/klar/blob/main/samples/basic/all.klar) shows all syntax features in the language.
+- [`samples/basic/main.klar`](https://github.com/klarlanguage/klar/blob/main/samples/basic/main.klar) is an invalid program that will display errors from the typechecker.
+- [`samples/basic/all.klon`](https://github.com/klarlanguage/klar/blob/main/samples/basic/all.klon) shows all the syntax features in Klon (_**Kl**ar **O**bject **N**otation_), Klar's homegrown markup format. The Glas manifest `glas.pack` and the Klar build file `klar.build` are also written in Klon.
+- [`samples/basic/Person.klar`](https://github.com/klarlanguage/klar/blob/main/samples/basic/Person.klar) compares the Klar syntax to Swift's in `samples/basic/Person.swift`.
+- [`samples/basic/theOG.klar`](https://github.com/klarlanguage/klar/blob/main/samples/basic/theOG.klar) shows the original program when Klar was first planned. The syntax used in the file has changed since Klar was originally planned, but the changes are documented in the file.
 
 The `mylang` folder can be passed to `klar build` directly, but files in `basic` must be passed individually (don't pass the folder itself). You can still pass multiple files (e.g. `klar build ./samples/basic/all.klar ./samples/basic/Person.klar` or `klar build ./samples/basic/*.klar`). Some example files have errors, but you'll get to experience Klar's detailed error reporting!
 
@@ -127,7 +127,7 @@ func getTopLanguage(user user, repo repo: String) -> Result<String?> {
     }
 }
 
-topLanguage := getTopLanguage(user: "ProCode-Software", repo: "klar")
+topLanguage := getTopLanguage(user: "klarlanguage", repo: "klar")
 print(topLanguage)
 ```
 
@@ -158,9 +158,9 @@ The contributing guide also contains information on:
 
 ## Feedback, Comments, and RFCs
 
-**We're in need of comments!!** Klar uses RFCs to collect feedback on how features should be implemented in the language. To view the active RFCs and submit feedback, see the [RFCs discussion page](https://github.com/ProCode-Software/klar/discussions/4).
+**We're in need of comments!!** Klar uses RFCs to collect feedback on how features should be implemented in the language. To view the active RFCs and submit feedback, see the [RFCs discussion page](https://github.com/klarlanguage/klar/discussions/4).
 
-For other feedback and discussions, where you can request features and comment on existing ones, see the general [discussions page](https://github.com/ProCode-Software/klar/discussions).
+For other feedback and discussions, where you can request features and comment on existing ones, see the general [discussions page](https://github.com/klarlanguage/klar/discussions).
 
 ## License
 

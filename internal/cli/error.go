@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
-	"github.com/ProCode-Software/klar/internal/module"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/module"
 )
 
 func TitlePrefix(color, title string) string {

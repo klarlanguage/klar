@@ -1,6 +1,6 @@
 package klarerrs
 
-import "github.com/ProCode-Software/klar/internal/lexer"
+import "github.com/klarlanguage/klar/internal/lexer"
 
 type Info interface {
 	info()

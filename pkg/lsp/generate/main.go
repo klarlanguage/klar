@@ -9,8 +9,8 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/ProCode-Software/klar/pkg/lsp"
-	"github.com/ProCode-Software/klar/pkg/lsp/rpc"
+	"github.com/klarlanguage/klar/pkg/lsp"
+	"github.com/klarlanguage/klar/pkg/lsp/rpc"
 )
 
 const integerIsInt32 = false

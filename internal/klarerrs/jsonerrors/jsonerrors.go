@@ -5,8 +5,8 @@ import (
 	"encoding/json/v2"
 	"io"
 
-	"github.com/ProCode-Software/klar/internal/build"
-	"github.com/ProCode-Software/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/internal/build"
+	"github.com/klarlanguage/klar/internal/klarerrs"
 )
 
 // WriteTo writes the build result and error information to w in JSON format.

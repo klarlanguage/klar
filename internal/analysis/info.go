@@ -1,6 +1,6 @@
 package analysis
 
-import "github.com/ProCode-Software/klar/internal/ast"
+import "github.com/klarlanguage/klar/internal/ast"
 
 type Info struct {
 	Expressions map[ast.Expression]*Expr

@@ -7,7 +7,7 @@ import (
 	"os"
 	"slices"
 
-	"github.com/ProCode-Software/klar/internal/cli/ansi"
+	"github.com/klarlanguage/klar/internal/cli/ansi"
 	"golang.org/x/term"
 )
 

@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 
-	"github.com/ProCode-Software/klar/pkg/klon/klonflags"
+	"github.com/klarlanguage/klar/pkg/klon/klonflags"
 )
 
 func parseKlonFlags() (flags klonflags.Flags, ast bool) {

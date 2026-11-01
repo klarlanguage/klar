@@ -3,9 +3,9 @@ package klon
 import (
 	"fmt"
 
-	"github.com/ProCode-Software/klar/internal/ranges"
-	"github.com/ProCode-Software/klar/pkg/klon/ast"
-	"github.com/ProCode-Software/klar/pkg/klon/klonerrs"
+	"github.com/klarlanguage/klar/internal/ranges"
+	"github.com/klarlanguage/klar/pkg/klon/ast"
+	"github.com/klarlanguage/klar/pkg/klon/klonerrs"
 )
 
 func (rd *reader) hasTokens() bool { return rd.currTok().Kind != EOF }

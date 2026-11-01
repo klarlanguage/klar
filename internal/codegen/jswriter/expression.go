@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/ProCode-Software/klar/internal/ir/jsir"
+	"github.com/klarlanguage/klar/internal/ir/jsir"
 )
 
 func (w *Writer) writeExpression(expr jsir.Expression) {

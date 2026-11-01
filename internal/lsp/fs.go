@@ -7,12 +7,12 @@ import (
 	"strings"
 	"time"
 
-	klarast "github.com/ProCode-Software/klar/internal/ast"
-	"github.com/ProCode-Software/klar/internal/build"
-	"github.com/ProCode-Software/klar/internal/klarerrs"
-	"github.com/ProCode-Software/klar/pkg/klon"
-	klonast "github.com/ProCode-Software/klar/pkg/klon/ast"
-	"github.com/ProCode-Software/klar/pkg/lsp"
+	klarast "github.com/klarlanguage/klar/internal/ast"
+	"github.com/klarlanguage/klar/internal/build"
+	"github.com/klarlanguage/klar/internal/klarerrs"
+	"github.com/klarlanguage/klar/pkg/klon"
+	klonast "github.com/klarlanguage/klar/pkg/klon/ast"
+	"github.com/klarlanguage/klar/pkg/lsp"
 )
 
 type FileSystem struct {
