@@ -48,14 +48,15 @@ func ShowHelp(w io.Writer, full bool) {
 	)
 
 	// Social Links
-	hb.ShortTitle("GitHub")
-	hb.Println(ansi.Magenta(cli.KlarGitHub))
+	hb.ShortTitle("Docs")
+	hb.Println(ansi.Blue(cli.KlarWebsite + "/docs/glas"))
 }
 
 var groups = []struct {
 	color    string
 	commands []string
 }{
-	{ansi.ColorBit8(159), []string{"add", "update", "remove", "install"}},
+	{ansi.ColorBit8(159), []string{"add", "update", "remove", "install", "clone"}},
 	{ansi.ColorBit8(3), []string{"list", "outdated", "why", "audit", "info", "clean"}},
+	{ansi.ColorBit8(219), []string{"publish", "zip"}},
 }

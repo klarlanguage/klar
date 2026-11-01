@@ -12,8 +12,9 @@ var (
 )
 
 const (
-	KlarGitHub = "https://github.com/ProCode-Software/klar"
-	KlarIssues = KlarGitHub + "/issues"
+	KlarGitHub  = "https://github.com/ProCode-Software/klar"
+	KlarIssues  = KlarGitHub + "/issues"
+	KlarWebsite = "https://klarlanguage.github.io"
 )
 
 var KlarVersionAndCommit = KlarVersion + "+" + KlarCommit

@@ -66,6 +66,9 @@ var Commands = map[string]*command.Command{
 	"clone": {
 		ShortDescription: "Clone a package's source code into a project",
 	},
+	"zip": {
+		ShortDescription: "Bundle a package into a zip archive",
+	},
 }
 
 var Aliases = map[string]string{

@@ -72,7 +72,9 @@ func ShowHelp(w io.Writer, full bool) {
 	}
 
 	// Social Links
-	hb.ShortTitle("GitHub")
+	hb.ShortTitle("Website")
+	hb.Println(ansi.Blue(cli.KlarWebsite))
+	hb.ShortTitleNoNewline("GitHub")
 	hb.Println(ansi.Magenta(cli.KlarGitHub))
 }
 
