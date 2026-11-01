@@ -6,7 +6,7 @@ Provides an error reporting API for detailed errors with syntax highlighting, si
 
 Examples are also available in [sample.txt](./sample.txt), and [hints.txt](./hints.txt) for output containing hints.
 
-1. Reported from [`internal/analysis/function.go`]()
+1. Reported from [`internal/analysis/function.go`](<>)
 
 ```
 Type error: This function is supposed to return 'V', but the body contains no 'return' statements (missingReturn)
@@ -21,7 +21,7 @@ Type error: This function is supposed to return 'V', but the body contains no 'r
     · ^ No 'return' statements in the body
 ```
 
-2. Reported from [`internal/analysis/function.go`]()
+2. Reported from [`internal/analysis/function.go`](<>)
 
 ```
 Type error: Type mismatch: expected type '#{K: V}', but this has type 'T' (typeMismatch)
@@ -36,7 +36,7 @@ Type error: Type mismatch: expected type '#{K: V}', but this has type 'T' (typeM
     ·            ━━━━━━ The returned value has type 'T'
 ```
 
-3. Reported from [`internal/analysis/literal.go`]()
+3. Reported from [`internal/analysis/literal.go`](<>)
 
 ````
 Type error: I can't determine the item type of this empty list (untypedEmptyList)

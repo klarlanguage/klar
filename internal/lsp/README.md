@@ -86,4 +86,5 @@ Currently, KlarLS only supports JSON RPC communication over stdio. It may suppor
 ## Future Work
 
 - Make a mock LSP client for testing KlarLS
-- Port KlarLS to the browser/WebAssembly for use in the Klar Playground
+- Port KlarLS to the browser/WebAssembly for use in the [Klar Playground](https://klarlanguage.github.io/playground)
+- Improve stability and memory usage

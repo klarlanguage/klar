@@ -6,4 +6,4 @@ We have style guides for the following languages:
 
 - [Go](./GoStyleGuide.md)
 - [JavaScript/TypeScript](./JSStyleGuide.md)
-- [Klar]()
+- [Klar](./KlarStyleGuide.md)

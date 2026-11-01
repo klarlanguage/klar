@@ -18,3 +18,7 @@ Welcome to the Klar compiler! The `build` package implements everything you thin
 ## klar.build
 
 For each module, a `klar.build` will be resolved in the module's folder or its parents.
+
+## Credits
+
+The compiler pipeline was rewritten in June 2026 based on [Gleam's](https://github.com/gleam-lang/gleam). A basic specification (notes) can be found [here](https://github.com/ProCode-Software/klar/blob/71fe3f3c79dd93ea4dd5290d25835c83e1cfca99/docs/GleamCompiler.md).

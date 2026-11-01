@@ -222,6 +222,7 @@ func (p *Parser) ParseWhileStatement() *ast.WhileStatement {
 	// We're also allowing only 1 binding for readability.
 	// TODO: Maybe change our minds on these.
 	if curr := p.CurrKind(); curr != lexer.LeftCurlyBrace && curr != lexer.Colon {
+		// TODO: Allow discard? Would be useless though
 		conditionOrVar := p.ParseExpression(ExpressionBindingPower)
 		if p.CurrKind() == lexer.ColonEqual {
 			p.Advance()

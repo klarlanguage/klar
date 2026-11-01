@@ -53,9 +53,9 @@ func Parser.parseCommand() -> Result<Command, SyntaxError> {
 
     args: [Value] := []
     flags: [Flag] := []
-    while self.hasTokens() :loop {
+    while self.hasTokens() {
         when self.current() {
-            .newline | .eof -> stop :loop,
+            .newline | .eof -> stop,
             .dash -> {
                 // Flag
                 self.advance() // -
