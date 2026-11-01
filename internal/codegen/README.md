@@ -33,7 +33,7 @@ The JS IR is low-level, so bundling is handled during this step. Note that the c
 
 ### Representation
 
-See [docs/JavaScript/Representation.md](..//../docs/JavaScript/Representation.md) at the root of the repo for information about how Klar constructs are represented in JavaScript.
+See [docs/JavaScript/Representation.md](../../docs/JavaScript/Representation.md) at the root of the repo for information about how Klar constructs are represented in JavaScript.
 
 ## JavaScript IR to .js ([`jswriter`](./jswriter) package)
 

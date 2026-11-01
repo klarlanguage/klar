@@ -56,15 +56,12 @@ func NewGenerator(
 }
 
 func (g *Generator) Run() {
-	// Convert everything in each file to JS IR, except top-level methods and initializers
 	var wg sync.WaitGroup
 	for i, file := range g.Files {
 		// The file ID is the 1-based sorted index. See [analysis.Checker.initFileContexts]
 		wg.Go(func() { g.generateFile(file, analysis.FileID(i+1)) })
 	}
 	wg.Wait()
-
-	// Convert methods/initializers and add the to class bodies
 }
 
 // Top-level methods and initializers in the file are skipped
@@ -83,7 +80,7 @@ func (g *Generator) generateFile(f *File, fid analysis.FileID) {
 	// the type checker
 	for _, obj := range g.Module.Context.SortedDecls() {
 		declStmts[obj.Node()] = struct{}{}
-		if obj.File != fid || !g.canConvert(obj, true) {
+		if obj.File != fid || !g.canCodegen(obj) {
 			continue
 		}
 		jsStmt := g.convertObject(obj)
@@ -108,16 +105,15 @@ func (g *Generator) generateFile(f *File, fid analysis.FileID) {
 	// f.IR.Comments = make([]jsir.Comment, 0, len(f.AST.Comments))
 }
 
-func (g *Generator) canConvert(obj *analysis.Object, skipMethods bool) bool {
-	switch node := obj.Node().(type) {
-	case *ast.FunctionDeclaration:
-		return !skipMethods || node.SelfType == nil
-	case *ast.FuncAliasDeclaration:
-		return !skipMethods || node.SelfType == nil
+func (g *Generator) canCodegen(obj *analysis.Object) bool {
+	switch obj.Node().(type) {
 	case *ast.InterfaceDeclaration:
 		// Interfaces can't be converted to JavaScript
 		return (g.Flags & TypeScript) != 0
 	case *ast.TypeAliasDeclaration:
+		if (g.Flags & TypeScript) != 0 {
+			return true
+		}
 		// Only public type aliases that refer to user-declared concrete types
 		// can be converted to JS
 		if !obj.Public {
@@ -126,9 +122,16 @@ func (g *Generator) canConvert(obj *analysis.Object, skipMethods bool) bool {
 		switch obj.Kind() {
 		case analysis.KindStruct, analysis.KindEnum, analysis.KindTag:
 			return true
-		default:
-			return false
 		}
+		return false
 	}
 	return true
+}
+
+func (g *Generator) convertBlock(stmts *ast.Block, ctx *analysis.Context) *jsir.Block {
+	block := &jsir.Block{make([]jsir.Statement, 0, len(stmts.Body))}
+	for _, stmt := range stmts.Body {
+		_ = stmt
+	}
+	return block
 }
