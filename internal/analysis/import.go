@@ -2,6 +2,7 @@ package analysis
 
 import (
 	"fmt"
+	"maps"
 	"slices"
 	"strings"
 
@@ -18,29 +19,15 @@ type Importer interface {
 	// TODO: import wildcard that returns []*Module
 }
 
-type ImportContext interface {
-	Target() target.Target
+type ImportContext struct {
+	Target target.Target
 	// The import path of the module that is importing.
-	ImportPath() imports.ImportPath
+	ImportPath imports.ImportPath
 	// The folder path of the module that is importing.
-	DirPath() string
+	DirPath string
 	// Whether the module that is importing is a single file.
-	SingleFile() bool
+	SingleFile bool
 }
-
-// importCtx is the implementation of [ImportContext].
-type importCtx struct {
-	target     target.Target
-	importPath imports.ImportPath
-	fileDir    string
-	singleFile bool
-	internal   bool
-}
-
-func (c *importCtx) Target() target.Target          { return c.target }
-func (c *importCtx) ImportPath() imports.ImportPath { return c.importPath }
-func (c *importCtx) DirPath() string                { return c.fileDir }
-func (c *importCtx) SingleFile() bool               { return c.singleFile }
 
 // performImports creates a new [Context] for each file and performs imports.
 func (c *Checker) performImports(files []string, fileContexts map[string]*Context) {
@@ -49,11 +36,11 @@ func (c *Checker) performImports(files []string, fileContexts map[string]*Contex
 		err    error
 	}
 	importCache := make(map[string]*imported)
-	ictx := &importCtx{
-		target:     c.Module.Targets[0], // TODO
-		importPath: c.Module.ImportPath,
-		fileDir:    c.Module.Path,
-		singleFile: c.Module.Flags.Has(SingleFileModule),
+	ictx := ImportContext{
+		Target:     c.Module.Targets[0], // TODO
+		ImportPath: c.Module.ImportPath,
+		DirPath:    c.Module.Path,
+		SingleFile: c.Module.Flags.Has(SingleFileModule),
 	}
 	for _, fileName := range files {
 		fctx := fileContexts[fileName]
@@ -69,19 +56,34 @@ func (c *Checker) performImports(files []string, fileContexts map[string]*Contex
 			impPathStr := imports.ImportPath.String(imp.Module)
 			// Try to load from cache, or import it fresh and save it to cache
 			res, ok := importCache[impPathStr]
-			if !ok {
+			newImport := func() (res *imported) {
 				res = &imported{}
-				res.module, res.err = c.importModule(imp.Module, ictx)
+				// If this module is a single file, report an error if the import isn't
+				// from the stdlib. Don't call importModule because it would likely
+				// report an error for the dependency not existing.
+				if c.Module.Flags.Has(SingleFileModule) && !imports.ImportPath.IsStdlib(imp.Module) {
+					res.err = klarerrs.ImportError(klarerrs.ErrSingleFileImport, imp.Module, nil)
+					return
+				}
+
+				if res.module, res.err = c.importModule(imp.Module, ictx); res.err != nil {
+					return
+				}
 				// Ensure the module is supported on the current targets
-				if res.err == nil {
-					if err := c.checkImportTargetSupport(res.module, imp); err != nil {
-						res.err = err
-					}
+				if err := c.checkImportTargetSupport(res.module, imp); err != nil {
+					// Setting res.err in the condition will set err to a nil *klarerrs.Error
+					// rather than a nil `error`
+					res.err = err
+					return
 				}
 				// Ensure the module has any public exports, otherwise report an error
-				if res.err == nil && !res.module.HasExports() {
+				if !res.module.HasExports() {
 					res.err = klarerrs.ImportError(klarerrs.ErrNoPublicExports, imp.Module, nil)
 				}
+				return res
+			}
+			if !ok {
+				res = newImport()
 				importCache[impPathStr] = res
 			}
 
@@ -95,14 +97,24 @@ func (c *Checker) performImports(files []string, fileContexts map[string]*Contex
 		}
 		fctx.setAttribute(firstStmtIndex, firstStmtI)
 	}
+
+	// Populate [Module.Imports]
+	// TODO: Should modules with errors be included?
+	c.Module.Imports = make([]*Module, 0, len(importCache))
+	for _, importPath := range slices.Sorted(maps.Keys(importCache)) {
+		mod := importCache[importPath].module
+		if mod != nil {
+			c.Module.Imports = append(c.Module.Imports, mod)
+		}
+	}
 }
 
-func (c *Checker) importModule(p imports.ImportPath, impCtx *importCtx) (*Module, error) {
+func (c *Checker) importModule(p imports.ImportPath, ictx ImportContext) (*Module, error) {
 	if c.Options.Importer == nil {
-		// Importer not set up
+		// Importer not set up, meaning imports aren't allowed
 		return nil, &klarerrs.Error{Code: klarerrs.ErrImporterNotFound}
 	}
-	return c.Options.Importer.Import(p, impCtx)
+	return c.Options.Importer.Import(p, ictx)
 }
 
 func (c *Checker) applyImportedModule(mod *Module, stmt *ast.ImportStatement, fctx *Context) {
@@ -169,13 +181,13 @@ func (c *Checker) reportImportError(importPath string, err error,
 	fid FileID, stmt *ast.ImportStatement,
 ) {
 	kerr, ok := err.(*klarerrs.Error)
-	if !ok {
+	if ok {
+		kerr = new(*kerr) // Copy the importer's error so we can add location info
+	} else {
 		kerr = &klarerrs.Error{
 			Code: klarerrs.ErrImporterError,
 			Info: klarerrs.ModuleErrorInfo{ImportPath: importPath, Err: err},
 		}
-	} else {
-		kerr = new(*kerr) // Copy the importer's error so we can add location info
 	}
 	kerr.Node = stmt
 	kerr.Range = stmt.Range

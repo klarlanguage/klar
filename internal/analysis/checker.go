@@ -89,7 +89,7 @@ func (c *Checker) Init(mod *Module, files map[string]*ast.Program, opts *Options
 	}
 	mod.Info = &Info{
 		Expressions: make(map[ast.Expression]*Expr),
-		Blocks:      make(map[ast.Node]*stmtContext),
+		Blocks:      make(map[ast.Node]*Block),
 	}
 	c.Module = mod
 	c.Programs = files
@@ -130,7 +130,7 @@ func (c *Checker) Check() {
 	// Run delayed actions, including checking function bodies & top-level statements
 	c.runDelayed(0)
 	// Report warnings for unused top-level objects and imports
-	c.reportTopLevelUnused()
+	c.reportTopLevelUnused(sortedFiles)
 
 	c.ResetState() // Free memory
 }
@@ -224,12 +224,12 @@ func (c *Checker) runDelayed(from int) {
 	c.delayed = c.delayed[:from]
 }
 
-func (c *Checker) reportTopLevelUnused() {
+func (c *Checker) reportTopLevelUnused(sortedFiles []string) {
 	// Unused unexported top-level objects
 	c.reportUnusedWarnings(c.Module.Context)
 	// Unused imports
-	for _, fid := range slices.Sorted(maps.Keys(c.Module.fileContext)) {
-		fctx := c.Module.fileContext[fid]
+	for i := range sortedFiles {
+		fctx := c.Module.fileContext[FileID(i+1)]
 		// Errors may have already been reported while checking top-level statements
 		if fctx.getAttribute(unusedReported) != true {
 			c.reportUnusedWarnings(fctx)

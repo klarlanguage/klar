@@ -31,16 +31,20 @@ type loopLabel struct {
 	node ast.Node // 'for', 'while', or 'when'
 }
 
-type stmtFlags uint8
+type stmtFlags uint16
 
 const (
-	allowReturn   stmtFlags = 1 << iota // Function body
-	allowNextStop                       // Allow 'next' and 'stop' (for/while/when)
-	finalWhenCase
-	unreachableStmt // After an expr/stmt that doesn't return (return/stop/next/crashout)
-	braceless       // Body of a braceless 'when' case
+	allowReturn     stmtFlags = 1 << iota // Function body
+	allowNextStop                         // Allow 'next' and 'stop' (for/while/when)
+	finalWhenCase                         // Disallow 'next'
+	unreachableStmt                       // After an expr/stmt that doesn't return (return/stop/next/crashout)
+	braceless                             // Body of a braceless 'when' case
 	allowForwardDecl
 	whenStmt
+
+	containsStop
+	containsNext
+	containsReturn
 )
 
 func newStmtContext(ctx *Context, fid FileID, flags stmtFlags) *stmtContext {
@@ -100,7 +104,11 @@ func (sctx *stmtContext) declareLabel(name string, r ranges.Range, node ast.Node
 }
 
 func (c *Checker) checkBlock(stmts []ast.Statement, sctx *stmtContext) {
-	defer func(oldFlags stmtFlags) { sctx.flags = oldFlags }(sctx.flags)
+	defer func(oldFlags stmtFlags) {
+		if (oldFlags & allowForwardDecl) == 0 {
+			sctx.flags &^= allowForwardDecl
+		}
+	}(sctx.flags)
 	sctx.flags |= allowForwardDecl
 
 	// Declare functions and types first
@@ -127,14 +135,13 @@ func (c *Checker) checkBlock(stmts []ast.Statement, sctx *stmtContext) {
 		// Ensure there is no code after a return (always unreachable). We will
 		// continue typechecking those unreachable statements, but don't report
 		// another error. Never reported after TODO calls.
-		if sctx.flags&unreachableStmt != 0 && !unreachableReported &&
-			i < len(normalStmts)-1 {
+		if sctx.flags&unreachableStmt != 0 && !unreachableReported && i < len(normalStmts)-1 {
 			err := klarerrs.Slice(klarerrs.ErrAlwaysUnreachable, normalStmts[i+1:])
 			err.SetParam("kind", terminatingStmtKind(stmt))
 			if len(normalStmts[i+1:]) == 1 {
-				err.Label = "This statement is unreachable"
+				err.Label = "This statement will never be run"
 			} else {
-				err.Label = "These statements are unreachable"
+				err.Label = "These statements will never be run"
 			}
 			c.fileError(err, sctx.ctx.File)
 			unreachableReported = true
@@ -241,9 +248,9 @@ func (c *Checker) checkStmt(stmt ast.Statement, sctx *stmtContext) {
 
 	// Control
 	case *ast.StopStatement:
-		c.checkControlStmt(stmt, stmt.Label, sctx)
+		c.checkControlStmt(stmt, stmt.Label, sctx, false)
 	case *ast.NextStatement:
-		c.checkControlStmt(stmt, stmt.Label, sctx)
+		c.checkControlStmt(stmt, stmt.Label, sctx, true)
 	case *ast.ReturnStatement:
 		c.checkReturnStmt(stmt, sctx)
 	default:
@@ -338,7 +345,7 @@ func (c *Checker) checkReturnStmt(stmt *ast.ReturnStatement, sctx *stmtContext) 
 			c.fileError(warn, sctx.fid())
 		}
 	}
-	sctx.flags |= unreachableStmt
+	sctx.flags |= unreachableStmt | containsReturn
 	*sctx.returns = append(*sctx.returns, returnStmt{expr: e, pos: pos})
 }
 
@@ -432,17 +439,29 @@ func (c *Checker) checkWhileStmt(stmt *ast.WhileStatement, sctx *stmtContext) {
 	bodySctx := newChildStmtContext(sctx, bodyCtx, allowNextStop)
 	c.recordBlock(stmt.Body, bodySctx)
 	c.checkBlock(stmt.Body.Body, bodySctx)
+	// TODO: Mark the sctx as unreachable if there is no condition or it is 'true',
+	// and there is no 'stop' in the body.
 }
 
 func (c *Checker) checkControlStmt(stmt ast.Statement,
-	label *ast.Identifier, sctx *stmtContext,
+	label *ast.Identifier, sctx *stmtContext, isNext bool,
 ) {
 	fid := sctx.ctx.File
 	if (sctx.flags & allowNextStop) == 0 {
 		c.fileError(klarerrs.Node(klarerrs.ErrMisplacedControlStmt, stmt), fid)
 		return
 	}
-	sctx.flags |= unreachableStmt
+	if sctx.flags&finalWhenCase != 0 && isNext {
+		err := klarerrs.Node(klarerrs.ErrNextInLastWhenCase, stmt)
+		err.Hint("The 'next' statement in a 'when' case checks the remaining cases in the 'when' expression, but there are no more cases.")
+		c.fileError(err, fid)
+	}
+
+	if isNext {
+		sctx.flags |= containsNext | unreachableStmt
+	} else {
+		sctx.flags |= containsStop | unreachableStmt
+	}
 	if label != nil {
 		labelDef, ok := sctx.loopLabels[label.Name]
 		if !ok {

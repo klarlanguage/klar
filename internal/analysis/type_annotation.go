@@ -117,9 +117,7 @@ func (c *Checker) expectTypeName(o *Object, expr ast.Node, fid FileID) bool {
 
 func (c *Checker) checkGenericCount(o *Object, r ranges.Range, flags Flag, fid FileID) bool {
 	if min, max := numGenerics(o.Type); min > 0 && flags&genericLHS == 0 {
-		err := genericParamsCountError(
-			klarerrs.ErrGenericParamsRequired, o.Name, r, min, max,
-		)
+		err := genericParamsCountError(o.Name, r, min, max)
 		c.fileError(err, fid)
 		return false
 	}
@@ -175,11 +173,8 @@ func numGenerics(t Type) (min, max int) {
 	}
 }
 
-func genericParamsCountError(
-	code klarerrs.Code, name string, r ranges.Range,
-	min, max int,
-) *klarerrs.Error {
-	err := klarerrs.Range(code, r)
+func genericParamsCountError(name string, r ranges.Range, min, max int) *klarerrs.Error {
+	err := klarerrs.Range(klarerrs.ErrInvalidGenericCount, r)
 	var countRange string
 	if min == max {
 		countRange = strconv.Itoa(min)
@@ -203,9 +198,7 @@ func (c *Checker) parseGenericType(expr *ast.GenericType, ctx *Context) Type {
 	// Validate the count of required generic parameters
 	minCt, maxCt := numGenerics(lhs)
 	if len(expr.Parameters) < minCt || len(expr.Parameters) > maxCt {
-		err := genericParamsCountError(
-			klarerrs.ErrInvalidGenericCount, lhs.String(), expr.Range, minCt, maxCt,
-		)
+		err := genericParamsCountError(lhs.String(), expr.Range, minCt, maxCt)
 		if maxCt == 0 {
 			// Type doesn't take any generic params
 			err.Code = klarerrs.ErrNonGenericType

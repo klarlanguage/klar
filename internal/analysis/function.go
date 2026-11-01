@@ -424,18 +424,19 @@ func (c *Checker) checkFuncBody(stmt *ast.FunctionDeclaration, ov *Overload,
 	c.recordBlock(stmt.Body, sctx)
 	c.checkBlock(stmt.Body.Body, sctx)
 
-	// Ensure return statements are present. They aren't needed if:
+	// Ensure return statements are present, or the function never returns
+	// (similar to Go's rules). They aren't needed if:
 	// - The return type is Nothing
 	// - The function crashouts or has a TODO, or
 	// - The function is an initializer (TODO: warn about a missing return
 	// if 'self' isn't mutated)
-	if len(*sctx.returns) == 0 && ov.Return.Kind() != NothingType &&
-		sctx.flags&unreachableStmt == 0 && ov.info.funcKind != initFunc {
+	if ov.Return.Kind() != NothingType && sctx.flags&unreachableStmt == 0 &&
+		ov.info.funcKind != initFunc {
 		err := klarerrs.Position(klarerrs.ErrMissingReturn, stmt.Body.Range.End)
-		err.Label = "No 'return' statements in the body"
+		err.Label = "The body doesn't end in a 'return' statement"
 		err.Name = ov.Return.String()
 		err.AddHighlight(
-			"This function is supposed to return "+quote(ov.Return.String()),
+			"This function is supposed to return "+quoteAka(ov.Return),
 			retRange,
 		)
 		c.fileError(err, ov.File)

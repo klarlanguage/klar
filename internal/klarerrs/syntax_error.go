@@ -169,6 +169,7 @@ const (
 	ErrCallInConstant         // Function calls aren't allowed in constant expressions
 	ErrNotAllowedInInterp     // Expression not allowed in a string or regex interpolation
 	ErrNonLiteralInAttr       // All expressions in attributes must be literals
+	ErrNextInLastWhenCase     // Can't fallthrough in the last 'when' case
 )
 
 func (e *Error) handleSyntaxError() string {
@@ -350,7 +351,7 @@ func (e *Error) handleSyntaxError() string {
 		return "Only enums can have generic parameters"
 	case ErrAlwaysUnreachable:
 		kind := e.StringParam("kind")
-		return "Everything after " + kind + " is always unreachable"
+		return "Everything after " + kind + " is always unreachable and will never be run"
 	case ErrReservedKeyword:
 		return fmt.Sprintf(
 			"Can't use %s as an identifier because it is a reserved keyword",
@@ -384,7 +385,7 @@ func (e *Error) handleSyntaxError() string {
 	case ErrMultipleKeysInMapRest:
 		return "A spread must be its own key"
 	case ErrNonNameDeclaration:
-		return "Expression to the left of ':=' must be a name"
+		return "The expression to the left of ':=' must be a name"
 	case ErrMixTypeTupleLabels:
 		return "Can't mix 'label: type' and 'type' syntax in tuple or parameters"
 	case ErrNonNameFuncAlias:
@@ -584,5 +585,11 @@ func (e *Error) handleSyntaxError() string {
 		return "A parameter to an attribute must be a literal"
 	case ErrLeadingDecimalPoint:
 		return "A number is required before the decimal point"
+	case ErrNextInLastWhenCase:
+		return "Can't use a 'next' statement in the last 'when' case"
+	case ErrReturnInPipelineExpr:
+		return "A 'return' step can only be used in a pipeline used a statement"
+	case ErrPositionalFieldProvided:
+		return "The " + Quote(e.Name) + " field was already provided, without a label"
 	}
 }

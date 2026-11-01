@@ -627,7 +627,7 @@ func (c *Checker) checkBinaryOperation(op ast.Operator, lhs, rhs Type,
 	switch op.Kind {
 	case lexer.AndAnd, lexer.OrOr:
 		result = BoolType
-		for _, side := range [...]struct {
+		for i, side := range [...]struct {
 			t    Type
 			node ast.Expression
 		}{{lhs, lhsNode}, {rhs, rhsNode}} {
@@ -638,6 +638,14 @@ func (c *Checker) checkBinaryOperation(op ast.Operator, lhs, rhs Type,
 			err.Code = klarerrs.ErrNonBoolLogical
 			err.Name = op.String()
 			err.Label = "This has type " + quote(lhs.String())
+			if i == 1 && Compatible(lhs, BoolType) {
+				// Offer a hint if people are using logical expressions to call something
+				// like they would in JavaScript. Use a `when` expression instead.
+				// 	_ = value > 10 && crashout('...')
+				// TODO: Offer a hint if `condition && value1 || value2` is used
+				// TODO: Add a diff, and probably only show this hint if the RHS has side effects
+				err.Hint("Use a 'when' expression instead.")
+			}
 			c.fileError(err, fid)
 			return InvalidType
 		}
@@ -732,7 +740,7 @@ func (c *Checker) checkBinaryOperation(op ast.Operator, lhs, rhs Type,
 		}
 		// In Klar, all types can be compared for equality
 		if compType.Kind() == KindFunction {
-			// If comparing functions, we can report an error if different function
+			// TODO: If comparing functions, we can report an error if different function
 			// references are compared, because the result is always known.
 			// 	func a() = 1
 			// 	func b() = 1

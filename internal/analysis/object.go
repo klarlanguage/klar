@@ -142,6 +142,7 @@ func (o *Object) Clone(mod *Module, fid FileID, rang ranges.Range) *Object {
 }
 
 // Node returns the AST node that represents o's declaration.
+// Instead of returning [ast.PublicDeclaration], the statement inside it is returned.
 func (o *Object) Node() ast.Statement { return o.info.node }
 
 type ObjectKind interface {

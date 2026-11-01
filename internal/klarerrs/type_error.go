@@ -32,18 +32,18 @@ const (
 	ErrInvalidInitReturn      // Initializer for T must return T | T? | Result<T>
 	ErrInvalidListInitReturn  // Initializer for List must return a list (List | List? | Result<List>)
 	ErrMissingReturn          // Function doesn't return Nothing but contains no return statements
+	ErrMissingReturnInWhen    // Missing return caused by not all 'when' cases returning
 	ErrPrivateAttributes      // @deprecated and @added attributes aren't allowed on private declarations
 
 	// Type expression ====
 
-	ErrNotAType              // Variable or function used in type context
-	ErrTypeAsValue           // Type used as a value
-	ErrInvalidRestType       // Rest type used outside of function parameter
-	ErrNotANamespace         // Left-hand side of type index must be a namespace
-	ErrGenericParamsRequired // Reference to generic type requires params
-	ErrNonGenericType        // Generics passed to type that doesn't accept any
-	ErrInvalidGenericCount   // Too few/many generic parameters passed
-	ErrOptionalMap           // Neither map keys nor values may have an optional type
+	ErrNotAType            // Variable or function used in type context
+	ErrTypeAsValue         // Type used as a value
+	ErrInvalidRestType     // Rest type used outside of function parameter
+	ErrNotANamespace       // Left-hand side of type index must be a namespace
+	ErrNonGenericType      // Generics passed to type that doesn't accept any
+	ErrInvalidGenericCount // Too few/many generic parameters passed
+	ErrOptionalMap         // Neither map keys nor values may have an optional type
 
 	// Statement ====
 
@@ -100,16 +100,15 @@ const (
 
 	// Binary/unary operation ====
 
-	ErrNegateNonNumeric      // Negate '-' operator only supported on Int and Float
-	ErrNonBoolLogicalOperand // Operand for '||', '&&', or '!' operator must be Bool
-	ErrInvalidOperation      // Type doesn't support an arithmetic operation
-	ErrInvalidArithType      // Operand for arithmetic operation must be numeric
-	ErrInvalidAdditionType   // Type doesn't support the '+' operator
-	ErrIntTimesString        // Should be String * Int, in that exact order
-	ErrInvalidStringMult     // String must be multiplied by Int
-	ErrNonBoolLogical        // Operands in logical expression must be boolean
-	ErrInvalidInOperand      // Right-hand side of 'in' operator must be a list or map
-	ErrOperandTypeMismatch   // Operands of and/or must have the same type
+	ErrNegateNonNumeric    // Negate '-' operator only supported on Int and Float
+	ErrInvalidOperation    // Type doesn't support an arithmetic operation
+	ErrInvalidArithType    // Operand for arithmetic operation must be numeric
+	ErrInvalidAdditionType // Type doesn't support the '+' operator
+	ErrIntTimesString      // Should be String * Int, in that exact order
+	ErrInvalidStringMult   // String must be multiplied by Int
+	ErrNonBoolLogical      // Operands in logical expression must be boolean
+	ErrInvalidInOperand    // Right-hand side of 'in' operator must be a list or map
+	ErrOperandTypeMismatch // Operands of and/or must have the same type
 
 	// When ====
 
@@ -249,8 +248,6 @@ func (e *Error) handleTypeError() string {
 		return "Type " + Quote(e.Name) + "'s fields must be accessed via a dot-index"
 	case ErrInvalidArithType:
 		return "The " + Quote(e.Name) + " operator is only supported with numeric operands"
-	case ErrNonBoolLogicalOperand:
-		return "Logical operator " + Quote(e.Name) + " requires Bool or optional operands"
 	case ErrInvalidStringMult:
 		return "Type String can only be multiplied by Int"
 	case ErrFieldAndMethodSameName:
@@ -267,7 +264,7 @@ func (e *Error) handleTypeError() string {
 	case ErrInvalidListInitReturn:
 		return "An initializer for 'List' must return a list, possibly as an optional or result"
 	case ErrMissingReturn:
-		return "This function is supposed to return " + Quote(e.Name) + ", but the body contains no 'return' statements"
+		return "You forgot a 'return' statement at the end of the function"
 	case ErrUntypedEmptyList:
 		return "I can't determine the item type of this empty list"
 	case ErrUntypedNil:
@@ -366,5 +363,11 @@ func (e *Error) handleTypeError() string {
 		return "Type " + e.Name + " doesn't take any generic parameters"
 	case ErrNonOptionalWhileVar:
 		return "An explicit condition is required after this variable unless it's an optional"
+	case ErrInvalidGenericCount:
+		return ""
+	case ErrNonBoolLogical:
+		return "Both operands of " + Quote(e.Name) + " must have type Bool"
+	case ErrMissingReturnInWhen:
+		return "Not all cases in this 'when' statement return"
 	}
 }
