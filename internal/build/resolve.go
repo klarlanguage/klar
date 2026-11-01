@@ -279,9 +279,6 @@ func (c *Compiler) moduleFromDir(
 		case IsKlarFile(name):
 			m.Programs[name] = nil
 			klarFiles++
-		default:
-			// TODO: filter by klar.build's asset extensions
-			m.Assets = append(m.Assets, name)
 		}
 	}
 	return
@@ -379,8 +376,6 @@ func (c *Compiler) resolvePackage(path string, nesting bool) (
 }
 
 func (c *Compiler) resolveSrcDir(dir string, modules *[]*Module) (klarFiles int, err error) {
-	var srcMod *Module // Initialized only if there are assets in the src folder
-
 	items, err := c.FS.ReadDir(dir)
 	if err != nil {
 		return klarFiles, &FilesystemError{"read", dir, err}
@@ -402,15 +397,6 @@ func (c *Compiler) resolveSrcDir(dir string, modules *[]*Module) (klarFiles int,
 		case IsKlarFile(name):
 			err = &InterfaceError{Value: path, Code: ErrFileInRoot}
 			return
-		default:
-			// Asset in the src folder
-			// TODO: We will allow it, but we currently don't know how it
-			// will be handled
-			if srcMod == nil {
-				srcMod = &Module{Path: dir}
-				*modules = append(*modules, srcMod)
-			}
-			srcMod.Assets = append(srcMod.Assets, name)
 		}
 	}
 	return

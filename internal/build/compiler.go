@@ -107,7 +107,6 @@ func (i *Input) IsSingleFile() bool {
 // TODO: Refactor this to optimize struct size
 
 type Module struct {
-	Assets      []string
 	Path        string                  // Directory path, or file if single-file
 	Programs    map[string]*ast.Program // Keys are file basenames (with extensions)
 	ModTimes    map[string]time.Time    // Same basenames as Programs
