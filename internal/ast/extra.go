@@ -50,7 +50,6 @@ type Identifier struct {
 	Name     string
 	Position lexer.Position
 	Len      uint32
-	_range   ranges.Range
 }
 
 // IsZero returns true if i is the zero value.
@@ -69,12 +68,7 @@ func (i Identifier) End() lexer.Position { return i.Range().End }
 func (i Identifier) String() string { return i.Name }
 
 // Range returns the range of i.
-func (i Identifier) Range() ranges.Range {
-	if i._range.Start.Line == 0 {
-		i._range = ranges.Offset(i.Position, 0, i.Len)
-	}
-	return i._range
-}
+func (i Identifier) Range() ranges.Range { return ranges.Offset(i.Position, 0, i.Len) }
 
 // Symbol returns i as a [Symbol].
 func (i Identifier) Symbol() *Symbol {
