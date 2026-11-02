@@ -332,4 +332,4 @@ When submitting your changes, you're allowed to:
 - Update multiple files with information about the same topic, or
 - Update a single file with information about multiple topics
 
-**Do not write ANY documentation with AI.** All documentation in this project must be written by humans.
+**Do not write ANY documentation with AI.** All documentation in this project must be written by humans, except inside `AGENTS.md`.
