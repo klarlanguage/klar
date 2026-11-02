@@ -187,6 +187,10 @@ func (p *Parser) ParseForStatement() *ast.ForStatement {
 	}
 	f.Label = p.tryParseLoopLabel()
 	f.Body = p.ParseBlock()
+	if p.CurrKind() == lexer.Or {
+		p.Advance()
+		f.Or = p.ParseBlock()
+	}
 	return f
 }
 

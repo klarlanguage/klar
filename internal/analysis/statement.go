@@ -494,6 +494,12 @@ func (c *Checker) checkForStmt(stmt *ast.ForStatement, sctx *stmtContext) {
 	bodySctx := newChildStmtContext(sctx, bodyCtx, allowNextStop)
 	c.recordBlock(stmt.Body, bodySctx)
 	c.checkBlock(stmt.Body.Body, bodySctx)
+	// 'or' branch
+	if stmt.Or != nil {
+		orSctx := newChildStmtContext(sctx, sctx.newChildContext(), 0)
+		c.recordBlock(stmt.Or, orSctx)
+		c.checkBlock(stmt.Or.Body, orSctx)
+	}
 }
 
 func (c *Checker) checkForVars(vars []*ast.AssignableTypePair, iter ast.Expression,
