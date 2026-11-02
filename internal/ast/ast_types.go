@@ -404,6 +404,7 @@ type StopStatement struct {
 //	for k, v in <expr> [:label]
 //	for item in <expr>
 //	for 5 { ...repeat 5 times }
+//  for ... {} or { ... }
 type ForStatement struct {
 	BaseNode
 	Variables []*AssignableTypePair // Pairs don't have default values
@@ -411,6 +412,7 @@ type ForStatement struct {
 	Iterator  Expression
 	Label     *Identifier
 	Body      *Block
+	Or        *Block // Executes if the main body never does
 }
 
 // A WhileStatement executes Body while Condition is true

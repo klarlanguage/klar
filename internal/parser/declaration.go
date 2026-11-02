@@ -207,6 +207,13 @@ func (p *Parser) ParseStruct(
 			attrs = a
 		}
 		f := &ast.StructField{Attributes: attrs}
+		// Struct fields can be keywords, so we have to make sure the 'readonly'
+		// isn't used as a name
+		if p.CurrKind() == lexer.Readonly &&
+			p.PeekKind() != lexer.Colon && p.PeekKind() != lexer.Comma {
+			f.Readonly = true
+			p.Advance()
+		}
 		// Keys
 		parseSeries(p, &f.Names, func() ast.Identifier {
 			name := p.ParseMapIdentOrDiscard(0)

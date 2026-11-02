@@ -55,6 +55,9 @@ func (c *Checker) checkStructDecl(o *Object, node *ast.StructDeclaration) {
 			f := NewObject(id.Name, o.File, fnode.Range, o.Module, nil)
 			NewVariable(f, StructFieldVar, typ)
 			f.attrs = attrs
+			if fnode.Readonly {
+				f.Flags |= ReadonlyStructField
+			}
 			str.Fields = append(str.Fields, f)
 			if _, ok := str.fieldMap[id.Name]; ok {
 				// Duplicate struct fields should have already been checked by the parser
