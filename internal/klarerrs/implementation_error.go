@@ -6,6 +6,7 @@ const (
 	ErrMissingImpl       // Missing implementation for some targets
 	ErrUnsupportedTarget // Object isn't supported for specific targets
 	ErrImplPathNotFound  // File path used as implementation doesn't exist
+	ErrMultipleImpls     // Implementation already declared for the same target
 
 	// JavaScript target
 

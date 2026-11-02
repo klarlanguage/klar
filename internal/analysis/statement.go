@@ -302,8 +302,7 @@ func (c *Checker) validateExprStmt(stmt *ast.ExpressionStatement, expr *Expr) {
 		// for when expressions or functions unless they return Nothing.
 		if expr.Kind() == KindTask {
 			// Task<Nothing> is an exception
-			task := As[*Task](expr.Type)
-			if task.Result.Kind() == NothingType {
+			if task := As[*Task](expr.Type); task.Result.Kind() == NothingType {
 				break
 			}
 		}
@@ -568,9 +567,7 @@ outer:
 			if explicitType != InvalidType {
 				typ = explicitType
 			}
-			for sym, typ := range c.followDestructure(
-				key, typ, ctx.File, iter.GetRange(), true,
-			) {
+			for sym, typ := range c.followDestructure(key, typ, fid, iter.GetRange(), true) {
 				sym, ok := sym.(*ast.Symbol)
 				if !ok {
 					continue // Discard
@@ -649,11 +646,14 @@ func (c *Checker) isIterable(t Type, numVars int) (varTypes []Type, err *klarerr
 
 // isAllowedAsStmt returns whether the given expression can be used as a statement.
 func isAllowedAsStmt(expr ast.Expression) bool {
-	switch expr.(type) {
-	case *ast.WhenExpression, *ast.CallExpression, *ast.PipelineExpression,
-		*ast.ObjectPipeline, *ast.GoExpression, *ast.AwaitExpression,
-		*ast.TryExpression:
+	switch expr := expr.(type) {
+	case *ast.WhenExpression, *ast.CallExpression, *ast.GoExpression,
+		*ast.AwaitExpression, *ast.TryExpression, *ast.AssertExpression,
+		*ast.PipelineExpression:
 		return true
+	case *ast.ObjectPipeline:
+		_, isAssign := expr.Steps[len(expr.Steps)-1].(*ast.AssignmentStatement)
+		return !isAssign
 	case *ast.BadExpression:
 		panic("typechecking invalid AST")
 	default:
@@ -695,36 +695,19 @@ func (c *Checker) checkAssignStmt(stmt *ast.AssignmentStatement, sctx *stmtConte
 	}
 }
 
+// uc is the uncompounded arithmetic operator (ex. '+' rather than '+=')
 func (c *Checker) checkAssignment(
 	lhs, rhs Type, lhsNode, rhsNode ast.Expression,
 	uc ast.Operator, fid FileID,
 ) {
-	// TODO: lhs may be an *Object. Check o.Type in that case.
-	switch lhs := lhs.(type) {
-	case *ConstantDecl:
-		// Can't assign to a const
-		err := klarerrs.Node(klarerrs.ErrAssignToConst, lhsNode)
-		// TODO: Name and range of declaration
-		c.fileError(err, fid)
+	if !c.checkAssignmentTarget(lhs, lhsNode, fid) {
 		return
-	case *Function, *Overload, *FunctionAlias:
-		// Functions are readonly
-	case *EnumRef:
-	case *Variable:
-		switch lhs.VarKind {
-		case StructFieldVar:
-			// TODO: Ensure it isn't readonly
-		}
-		// TODO: Other kinds
 	}
 	// String multiplication (`String * Int`) will be checked by checkBinaryOperation
 	isStringMult := uc.Kind == lexer.Asterisk && lhs.Kind() == StringType
 	if !Compatible(rhs, lhs) && !isStringMult {
 		err := typeMismatch(lhs, rhs, rhsNode.GetRange())
-		err.AddHighlight(
-			"The assignee has type "+quote(lhs.String()),
-			lhsNode.GetRange(),
-		)
+		err.AddHighlight("The assignee has type "+quote(lhs.String()), lhsNode.GetRange())
 		err.Label = strings.Replace(err.Label, "This", "This value", 1)
 		c.fileError(err, fid)
 		return
@@ -736,4 +719,40 @@ func (c *Checker) checkAssignment(
 			lhsNode, rhsNode, nil, fid,
 		)
 	}
+}
+
+func (c *Checker) checkAssignmentTarget(lhs Type, lhsNode ast.Expression, fid FileID) bool {
+	origLHS := lhs
+	obj, ok := lhs.(*Object)
+	if ok {
+		lhs = obj.Type
+	}
+	var targetKind string
+	// TODO: Check for interface field, string index assignments
+	switch lhs := lhs.(type) {
+	case *ConstantDecl:
+		// Can't assign to a const
+		err := klarerrs.Node(klarerrs.ErrAssignToConst, lhsNode)
+		err.AddDetail(quote(obj.Name)+" was declared here", obj.FilePath(), obj.Range)
+		c.fileError(err, fid)
+		return false
+	case *Function, *Overload, *FunctionAlias:
+		// Functions are readonly
+		targetKind = "function"
+	case *EnumRef:
+		targetKind = "enum"
+	case *Variable:
+		if lhs.VarKind == StructFieldVar && obj != nil && obj.Flags.Has(ReadonlyStructField) {
+			// TODO: Ensure it isn't readonly
+		}
+		// TODO: Other kinds
+		return true
+	default:
+		return true
+	}
+	err := klarerrs.Node(klarerrs.ErrInvalidAssignType, lhsNode)
+	err.Label = "The assignee has type " + quoteAka(origLHS)
+	err.Name = targetKind
+	c.fileError(err, fid)
+	return false
 }

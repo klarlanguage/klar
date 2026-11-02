@@ -396,6 +396,9 @@ func (a *ForStatement) Equal(b2 Node) bool {
 	if a.Body != nil && b.Body != nil && !a.Body.Equal(b.Body) {
 		return false
 	}
+	if a.Or != nil && b.Or != nil && !a.Or.Equal(b.Or) {
+		return false
+	}
 	return true
 }
 

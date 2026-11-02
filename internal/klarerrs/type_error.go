@@ -53,8 +53,8 @@ const (
 	ErrOver2LoopVars       // Can't declare more than 2 loop variables in a 'for' loop
 	ErrMultipleIntIterVars // Only 1 variable allowed when iterating over Int
 	ErrAssignToConst       // Attempted reassignment to constant reference
-	ErrInvalidAssignType   // Can't reassign a module item, enum item, or function
-	ErrAssignToIntfField   // Can't assign to an interface field
+	ErrAssignToReadonly    // Can't reassign to a readonly struct field outside a method
+	ErrInvalidAssignType   // Can't reassign a module item, interface item, enum item, or function
 	ErrUncommonReturnType  // Returns in a function must have a type in common
 	ErrInvalidNothingRet   // A function can't return Nothing if its return type isn't Nothing
 	ErrResultMustBeChecked // Result must be checked
@@ -369,5 +369,7 @@ func (e *Error) handleTypeError() string {
 		return "Both operands of " + Quote(e.Name) + " must have type Bool"
 	case ErrMissingReturnInWhen:
 		return "Not all cases in this 'when' statement return"
+	case ErrInvalidAssignType:
+		return "You can't assign to " + WithA(e.Name)
 	}
 }

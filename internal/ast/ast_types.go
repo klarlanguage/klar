@@ -404,7 +404,7 @@ type StopStatement struct {
 //	for k, v in <expr> [:label]
 //	for item in <expr>
 //	for 5 { ...repeat 5 times }
-//  for ... {} or { ... }
+//	for ... {} or { ... }
 type ForStatement struct {
 	BaseNode
 	Variables []*AssignableTypePair // Pairs don't have default values
@@ -432,11 +432,11 @@ type WhileStatement struct {
 
 // Examples:
 //
-//		import klar.http
-//		import klar.http.*
-//		import klar.regex.{RegEx}
-//		import klar.http.requests.{get as fetch}
-//	 import globalThis = klar.js
+//	import klar.http
+//	import klar.http.*
+//	import klar.regex.{RegEx}
+//	import klar.http.requests.{get as fetch}
+//	import globalThis = klar.js
 type ImportStatement struct {
 	BaseNode
 	Alias              *Identifier // Can be nil

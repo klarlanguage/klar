@@ -1,6 +1,8 @@
 package printer
 
 import (
+	"slices"
+
 	"github.com/klarlanguage/klar/internal/char"
 	"github.com/klarlanguage/klar/internal/lexer"
 	"github.com/klarlanguage/klar/internal/ranges"
@@ -64,7 +66,7 @@ func defaultPrintTokens(tokens []lexer.Token, flags PrintFlags) []byte {
 		tokRange := ranges.FromToken(tok).End
 		lastLine, lastCol = tokRange.Line, tokRange.Col
 	}
-	return b[:len(b):len(b)]
+	return slices.Clip(b)
 }
 
 var (
@@ -107,7 +109,7 @@ func prettyPrintTokens(tokens []lexer.Token, flags PrintFlags) []byte {
 		}
 		lastLine = ranges.FromToken(tok).End.Line
 	}
-	return b[:len(b):len(b)]
+	return slices.Clip(b)
 }
 
 // Pretty print rules

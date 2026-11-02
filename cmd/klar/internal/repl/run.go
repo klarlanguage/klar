@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/ergochat/readline"
 	"github.com/klarlanguage/klar/internal/cli"
 	"github.com/klarlanguage/klar/internal/cli/ansi"
 	"github.com/klarlanguage/klar/internal/lexer"
@@ -16,7 +17,6 @@ import (
 	astParser "github.com/klarlanguage/klar/internal/parser"
 	"github.com/klarlanguage/klar/internal/run"
 	"github.com/klarlanguage/klar/pkg/argparse"
-	"github.com/ergochat/readline"
 	"github.com/sanity-io/litter"
 )
 
