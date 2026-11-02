@@ -1,10 +1,11 @@
 public endOfFileError := Error('End of file')
 
-public type Discard: Readable, Writable, LengthReadable {}
+public type Discard: Readable, Writable, BufferWritable, WritableTo {}
 
-public func Discard.read() -> String { return "" }
-public func Discard.write(_: String) -> Nothing {}
-public func Discard.read(length length: Int) -> Result<String> = when length {
+public func Discard.read(bytes length: Int) -> Result<String> = when length {
     0 -> ''
     _ -> endOfFileError
 }
+public func Discard.write(_: String) -> Nothing {}
+public func Discard.writeToBuffer(buf: Buffer) -> Buffer = buf
+public func Discard.writeTo(writable: Writable) -> Writable = writable

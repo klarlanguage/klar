@@ -1,0 +1,11 @@
+public type Buffer {}
+
+public func Buffer.reader() -> BufferReader = TODO()
+public func Buffer.write(text: String) = TODO()
+public func Buffer.write(buffer: Buffer) = TODO()
+public func Buffer.writeChar(char: Int) = TODO()
+public func Buffer.length() -> Int = TODO()
+public func Buffer.clear() = TODO()
+public func Buffer.slice(from start, to end: Int) -> Buffer = TODO()
+
+public func String(buf: Buffer) = TODO()

@@ -13,5 +13,5 @@ public func (a: SortOrder).compare(to b: SortOrder) -> SortOrder = when a.value 
     < b.value -> .increasing,
     == b.value -> .equal,
     > b.value -> .decreasing,
-    _ -> crashout("Unreachable"),
+    _ -> impossible(),
 }

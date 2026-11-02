@@ -6,3 +6,11 @@
 public type #Writable {
     write(String) -> Result
 }
+
+public type #WritableTo {
+    writeTo(Writable) -> Result<Writable>
+}
+
+public type #BufferWritable {
+    writeTo(Buffer) -> Result<Buffer>
+}

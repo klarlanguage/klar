@@ -31,7 +31,7 @@ public func print(
 ) /* -> Result */
 
 // Includes [klar.io/Writable]. This is validated by the type checker.
-type Writable = Any | [Int] | [String]
+type Writable = Any | [String]
 
 // Prints an error message to the console, or standard error (stderr) for programs
 // running outside the browser, and terminates the program. Once you crashout,
@@ -77,3 +77,34 @@ for (number, word) in zip(numbers, words) {
 ```
 */
 public func zip<A, B>(a: [A], b: [B]) -> [(A, B)]
+
+/*
+Indicates that a branch of your code is never supposed to be possible. If
+you're wrong, and it runs, your program will crashout.
+
+This function is mostly semantic. It's more idomatic than calling
+`crashout('Unreachable')`. This function crashing will indicate a bug in your
+program. Don't use this when there is invalid input from the user; a more
+descriptive error message is preferred. This also shouldn't be used when
+invalid parameters are passed into your function, such as `divide(2, by: 0)`.
+
+One place you could use this function is to satisfy the compiler's exhaustiveness
+requirements. Suppose we are comparing two numbers, and printing a message
+based on their relation:
+```
+CORRECT_NUMBER := 30
+guess := random.int(from: 0, to: 100)
+message := when guess {
+    < CORRECT_NUMBER -> 'Too cold',
+    == CORRECT_NUMBER -> 'Just right',
+    > CORRECT_NUMBER -> 'Too hot',
+    _ -> impossible(),
+}
+print(message)
+```
+The default case is still required because the compiler doesn't think the 'when'
+cases are exhaustive (the compiler could improve in the future). That case is
+impossible because a number can only be greater than, less than, or equal
+to another number.
+*/
+public func impossible() { crashout("This shouldn't have run") }
