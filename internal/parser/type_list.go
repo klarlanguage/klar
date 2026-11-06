@@ -105,7 +105,7 @@ func (p *Parser) parseMethodParams() (params []*ast.MethodParam) {
 				Start: cmp.Or(first.Label.Position, first.Name.Position),
 				End:   last.Name.End(),
 			})
-			p.missingParamTypeAnnotError(err, "parameter", len(labels), params[len(params)-1].Range)
+			missingParamTypeAnnotError(err, "parameter", len(labels), params[len(params)-1].Range)
 			p.Error(err)
 		}
 		for _, lb := range labels {
@@ -187,7 +187,7 @@ func (p *Parser) ParseTupleType() ast.Type {
 		// Labels missing a type
 		if mode == labelsAndTypes {
 			err := klarerrs.Slice(klarerrs.ErrMissingLabelsType, labels)
-			p.missingParamTypeAnnotError(
+			missingParamTypeAnnotError(
 				err, "item", len(labels), t.Values[len(t.Values)-1].Range,
 			)
 			p.Error(err)
@@ -251,7 +251,7 @@ func (p *Parser) parseAssignableTypePairs(pairs *[]*ast.AssignableTypePair,
 				Start: pair.Keys[0].GetRange().Start,
 				End:   pair.Keys[len(pair.Keys)-1].GetRange().End,
 			})
-			p.missingParamTypeAnnotError(
+			missingParamTypeAnnotError(
 				err, "variable", len(pair.Keys), (*pairs)[len(*pairs)-1].GetRange(),
 			)
 			p.Error(err)

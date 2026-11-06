@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"github.com/klarlanguage/klar/internal/ast"
 	"github.com/klarlanguage/klar/internal/klarerrs"
 	"github.com/klarlanguage/klar/internal/lexer"
 	"github.com/klarlanguage/klar/internal/ranges"
@@ -131,7 +132,7 @@ func mismatchedLabelFormatError(err *klarerrs.Error,
 
 // missingParamTypeAnnotError formats an error for a missing type annotation for
 // a parameter or tuple item. missingParamTypeAnnotError sets err.Label.
-func (p *Parser) missingParamTypeAnnotError(err *klarerrs.Error,
+func missingParamTypeAnnotError(err *klarerrs.Error,
 	kind string, labelCount int, lastParamRange ranges.Range,
 ) {
 	err.SetParam("length", labelCount)
@@ -144,4 +145,16 @@ func (p *Parser) missingParamTypeAnnotError(err *klarerrs.Error,
 		Range:   lastParamRange,
 		Message: "This " + kind + " already has a type",
 	})
+}
+
+// TODO
+func ambiguousLogicalChainError(err *klarerrs.Error, lhs, rhs ast.Expression) {
+	// a == b && b == c || c == d
+	// a == b || b == c && c == d
+	err.AddHighlight("Wrap this part in parentheses", lhs.GetRange())
+	err.AddHighlight("Or this", rhs.GetRange())
+	err.HintWithDiff("Consider wrapping ", klarerrs.NewDiff("",
+		klarerrs.AddedString{Pos: lhs.GetRange().Start, String: "("},
+		klarerrs.AddedString{Pos: lhs.GetRange().End, String: ")"},
+	))
 }

@@ -17,6 +17,26 @@ func (p *Parser) ParseBinaryExpression(left ast.Expression, bp BindingPower) *as
 		p.Advance()
 	}
 	right := p.ParseExpression(bp)
+	// Check for ambiguous logical chains
+	//   Not allowed: a && b || c
+	// Parentheses will be required around a side:
+	//   a && (b || c)
+	// They are allowed when the same operator is used: `a && b && c`
+	if op.Kind == lexer.AndAnd || op.Kind == lexer.OrOr {
+		isLogicalExpr := func(expr ast.Expression) bool {
+			be, ok := expr.(*ast.BinaryExpression)
+			return ok &&
+				(be.Operator.Kind == lexer.AndAnd || be.Operator.Kind == lexer.OrOr) &&
+				be.Operator.Kind != op.Kind
+		}
+		if isLogicalExpr(left) || isLogicalExpr(right) {
+			err := klarerrs.Range(klarerrs.ErrAmbiguousLogicalChain, ranges.Range{
+				left.GetRange().Start, left.GetRange().End,
+			})
+			ambiguousLogicalChainError(err, left, right)
+			p.Error(err)
+		}
+	}
 	return &ast.BinaryExpression{
 		Left:     left,
 		Operator: newOperator(op),

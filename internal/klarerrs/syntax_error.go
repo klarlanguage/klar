@@ -101,6 +101,7 @@ const (
 	ErrStepInListSlice            // Step not allowed in list slice
 	ErrExpectedInterpolationEnd   // Expected end of string/regex interpolation
 	ErrInvalidForExprOperator     // Invalid or expected an operator in for expression
+	ErrAmbiguousLogicalChain      // Precedence of `a && b || c` is ambiguous
 
 	// Type =====
 
@@ -351,7 +352,7 @@ func (e *Error) handleSyntaxError() string {
 		return "Only enums can have generic parameters"
 	case ErrAlwaysUnreachable:
 		kind := e.StringParam("kind")
-		return "Everything after " + kind + " is always unreachable and will never be run"
+		return "Statements after " + kind + " will never run"
 	case ErrReservedKeyword:
 		return fmt.Sprintf(
 			"Can't use %s as an identifier because it is a reserved keyword",
@@ -591,5 +592,7 @@ func (e *Error) handleSyntaxError() string {
 		return "A 'return' step can only be used in a pipeline used a statement"
 	case ErrPositionalFieldProvided:
 		return "The " + Quote(e.Name) + " field was already provided, without a label"
+	case ErrAmbiguousLogicalChain:
+		return "Mixing '&&' and '||' in a chain is ambiguous"
 	}
 }
