@@ -75,6 +75,7 @@ const (
 
 func (mode exprMode) has(opt exprMode) bool { return (mode & opt) != 0 }
 
+// ConstExpr panics if e doesn't represent a constant.
 func (e *Expr) ConstExpr() *ConstExpr {
 	switch t := e.Type.(type) {
 	case *ConstantDecl:
@@ -235,9 +236,11 @@ func (c *Checker) checkExpr(expr ast.Expression, t *Expr) *Expr {
 func (c *Checker) validateExprLocation(expr ast.Expression, e *Expr) (ok bool) {
 	ok = true
 	// 1. No function calls in constants or the top-level
+	// They are allowed in single-file modules (TODO: the statements should
+	// probably be included as top-level code)
 	// TODO: Initializers, but only builtin ones, should still be allowed
 	if _, ok := expr.(*ast.CallExpression); ok {
-		if e.stmtCtx == nil {
+		if e.stmtCtx == nil && !c.Module.Flags.Has(SingleFileModule) {
 			err := klarerrs.Node(klarerrs.ErrTopLevelCall, expr)
 			err.Label = "Can't call a function here"
 			c.fileError(err, e.FileID())
@@ -412,10 +415,10 @@ func (c *Checker) checkGoExpr(expr *ast.GoExpression, t *Expr) {
 	// `Struct` is a function.
 	if expr.Body != nil {
 		// Treated as a function scope, so it can't return or break loops outside of the block
-		block := newStmtContext(NewContext(t.Context, t.FileID()), t.FileID(), allowReturn)
+		block := newStmtContext(NewContext(t.Context, t.FileID()), t.FileID(), true, 0)
 		c.recordBlock(expr.Body, block)
 		c.checkBlock(expr.Body.Body, block)
-		ret := c.inferReturnType(*block.returns)
+		ret := c.inferReturnType(block.returnCtx.returns)
 		t.Type = &Task{ret}
 		return
 	}
@@ -971,7 +974,7 @@ func makeAssertSafetyCommentRegex() {
 func (c *Checker) checkTryExpr(expr *ast.TryExpression, t *Expr) {
 	isREPL := c.Module.Flags.Has(REPLModule)
 	// Allow top-level 'try' expressions in REPL
-	if (t.stmtCtx == nil || t.stmtCtx.flags&allowReturn == 0) && !isREPL {
+	if !t.stmtCtx.returnsAllowed() && !isREPL {
 		err := klarerrs.Node(klarerrs.ErrTryOutsideFunc, expr)
 		c.fileError(err, t.Context.File)
 	}
@@ -991,10 +994,10 @@ func (c *Checker) checkTryExpr(expr *ast.TryExpression, t *Expr) {
 	t.Type = res.Success
 	// Add a virtual return to the function so the error type is typechecked
 	// against the function
-	if t.stmtCtx != nil {
+	if t.stmtCtx.returnsAllowed() {
 		errExpr := t.NewChild()
 		errExpr.Type = res.Error
-		*t.stmtCtx.returns = append(*t.stmtCtx.returns, returnStmt{
+		t.stmtCtx.returnCtx.returns = append(t.stmtCtx.returnCtx.returns, returnStmt{
 			expr: errExpr, pos: expr.Range,
 		})
 	}
@@ -1123,7 +1126,7 @@ func (c *Checker) checkLambdaBody(expr *ast.LambdaExpression, t *Expr) {
 	if expr.Block != nil {
 		// Creating a new stmtCtx without a parent so the body can't return or
 		// break the parent's loops
-		sctx := newStmtContext(bodyCtx, t.Context.File, allowReturn)
+		sctx := newStmtContext(bodyCtx, t.Context.File, true, 0)
 		c.recordBlock(expr.Block, sctx)
 		c.checkBlock(expr.Block.Body, sctx)
 	} else {

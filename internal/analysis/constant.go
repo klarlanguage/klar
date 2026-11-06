@@ -207,6 +207,24 @@ func (r RegexConst) String() string {
 	return "#/" + r.Pattern + "/" + r.Flags
 }
 
+type EnumConst struct {
+	Item *EnumItem
+	Args []ConstValue
+}
+
+func (e *EnumConst) ConstValue() any { return e }
+func (e *EnumConst) String() string {
+	var b strings.Builder
+	b.WriteByte('.')
+	b.WriteString(e.Item.Name)
+	if len(e.Args) > 0 {
+		b.WriteByte('(')
+		// TODO
+		b.WriteByte(')')
+	}
+	return b.String()
+}
+
 // Operations
 // ========
 

@@ -476,7 +476,7 @@ func (c *Checker) declareVars(d *ast.VariableDeclaration, sc *stmtCollector,
 }
 
 func (c *Checker) checkTopLevelStmts(stmts []ast.Statement, fctx *Context) *stmtContext {
-	sctx := newStmtContext(fctx, fctx.File, 0) // Return not allowed
+	sctx := newStmtContext(fctx, fctx.File, false, 0) // Return not allowed
 	c.checkBlock(stmts, sctx)
 	return sctx
 }

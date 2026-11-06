@@ -10,6 +10,7 @@ type Info struct {
 	InitOrder []*Object           // For top-level objects
 }
 
+// TODO: Change
 type Block struct {
 	Context *Context
 	Returns *[]returnStmt
@@ -21,7 +22,7 @@ type Block struct {
 func (c *Checker) recordBlock(node ast.Node, sctx *stmtContext) {
 	c.Module.Info.Blocks[node] = &Block{
 		Context:        sctx.ctx,
-		Returns:        sctx.returns,
+		Returns:        &sctx.returnCtx.returns,
 		Flags:          sctx.flags,
 		HasControlFlow: false, // TODO
 	}

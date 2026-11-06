@@ -123,13 +123,13 @@ Additionally:
 - **All AI usage to write code must be disclosed.** If AI wrote any code. It's not required if you asked an LLM for ideas or implementation suggestions only. You must state:
     - The tool you used (e.g. Claude Code), and
     - How much of the work was AI-assisted, and what parts were (e.g. tests, refactoring)
-- **You claim responsibility over all work**. You cannot blame an AI for incorrect code you submitted.
+- **You claim responsibility over all work**. You cannot blame an AI for incorrect code you submitted. You should be able to explain why you wrote any part of your code.
 - All LLM-generated code must be tested **by a human**. Tests must be run or written by a human, not autonomously for an agent to tell you the code works.
 - **Do not use AI to write documentation.** For this, you should make sure you can understand the code an LLM writes so you can write documentation for it.
-- Absolutely no discussions may be written by an LLM.
+- **Absolutely no discussions may be written by an LLM.**
 - Issues, PRs, or discussions opened by autonomous agents (such as those containing `codex` in the username) will be closed.
 - Low-effort or AI-generated PRs, issues, comments, or discussions will be closed quickly.
-- PRs containing AI slop code can get you banned. If you're unsure if the code is slop, be honest and let us know, and we'll give you grace.
+- **PRs containing AI slop code can get you banned.** If you're have to question the code, it's probably slop.
 - AI-generated code will be judged to the same standards as code written by humans. Because many LLMs are paid and are able to generate more code, **higher standards may be expected for AI-generated code**.
 - Violators may be banned from contributing in the Klar project at the discretion of the maintainers.
 
@@ -175,7 +175,7 @@ TODO: Add examples of each
 
 In recent months (as of 2026), in various open-source projects, maintainers have seen an influx in AI-generated security reports, with pressure to quickly patch them.
 
-We're welcome to security reports discovered by AI (with the human-written report requirement), but we ask that **if you can use AI to find a bug, you should also use it to suggest (and implement) a fix.** You should not fully rely on maintainers to fix them.
+We're welcome to security reports discovered by AI (with the human-written report requirement), but we ask that **if you can use AI to find a bug, you should also use it to suggest (and possibly implement) a fix.** You should not fully rely on maintainers to fix them.
 
 Be aware that many open-source contributors work on this project in their freetimes, and pressure to fix vulnerabilities take time and can lead to burnout. We would also like to prioritize and reward vulnerabilities filed by humans that took their time to investigate. Additionally, not every maintainer has the money to use the same frontier LLMs that are finding the vulnerabilities.
 
@@ -312,7 +312,7 @@ In the Klar codebase, we want the source code to be **understandable and maintai
 ### Formatters
 
 - **Go:** [gofumpt](https://github.com/mvdan/gofumpt) (a more opinionated version of gofmt) via `./scripts/format.sh`
-- **JavaScript, TypeScript, JSON**: [oxfmt](https://oxc.rs/) via `bun oxfmt`
+- **JavaScript, TypeScript, JSON**: [oxfmt](https://oxc.rs/) via `bunx oxfmt`
 
 Ensure you format your code before submitting your PR. Never file a PR just to format unformatted files. I may occasionally run formatters on the entire source tree.
 
@@ -333,3 +333,5 @@ When submitting your changes, you're allowed to:
 - Update a single file with information about multiple topics
 
 **Do not write ANY documentation with AI.** All documentation in this project must be written by humans, except inside `AGENTS.md`.
+
+Files and subdirectories in the `docs/` folder should be named in PascalCase, except for `index.md` and `README.md`.

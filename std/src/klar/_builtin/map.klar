@@ -94,7 +94,7 @@ public func Map.sortedByValues(
 public func Map.isDisjoint(from map: #{K: V}) -> Bool {
     when { self.length or map.length == 0 -> return true }
     for key, _ in map {
-        when key in self { true -> return false }
+        when key { in self -> return false }
     }
     return true
 }
@@ -142,10 +142,7 @@ public func Map.delete(keys keys: ...K) {
 // Deletes the entries that satisfy `pred`.
 public func Map.delete(where pred: func(K, V) -> Bool) {
     for k, v in self {
-    self[k] = v
-        when pred(k, v) {
-            true -> self[k] = nil
-        }
+        when pred(k, v) { true -> self[k] = nil }
     }
 }
 

@@ -5,14 +5,14 @@ type #Declaration: Statement
 type VarDecl: Declaration {}
 type TypeDecl: Declaration {}
 
-func check(node: Node, _: Statement) -> Bool
-func check(stmt: Statement, _: Statement) -> Bool
-func check(decl: Declaration, _: TypeDecl) -> Bool
-func check(typ: TypeDecl, _: Statement) -> Bool
+func check(node: Node, _: Statement) -> Bool = false
+func check(stmt: Statement, _: Statement) -> Bool = false
+func check(decl: Declaration, _: TypeDecl) -> Bool = false
+func check(typ: TypeDecl, _: Statement) -> Bool = false
 
-func check2(node: Node, _: Int) -> Bool
-func check2(stmt: Statement, _: Int) -> Bool
-func check2(decl: Declaration, _: Int) -> Bool
+func check2(node: Node, _: Int) -> Bool = false
+func check2(stmt: Statement, _: Int) -> Bool = false
+func check2(decl: Declaration, _: Int) -> Bool = false
 //func check2(typ: TypeDecl, _: Int) -> Bool
 //func check2(typ: VarDecl, _: Int) -> Bool
 

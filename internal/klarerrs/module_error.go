@@ -48,8 +48,9 @@ func (e *Error) handleModuleError() string {
 	case ErrPrivateImport:
 		return path + " is private to another package and can't be imported"
 	case ErrModuleCompileError:
+		// TODO: It would be really nice to show a GitHub issues URL for the package
 		e.Hint("If you aren't the author of the module, this isn't your fault. Consider reporting an issue to the author of the library.")
-		return "Module " + path + " failed to compile"
+		return "Module " + path + ", which you're trying to import, failed to compile"
 	case ErrModuleKlarTooNew:
 		expKlar := e.StringParam("expKlar")
 		currKlar := e.StringParam("currKlar")

@@ -206,7 +206,7 @@ func (c *Checker) checkOverload(ov *Overload, fnObj *Object) {
 		// expression but also an explicit return type, the expression
 		// will be checked later.
 		bodyExpr = c.checkExpr(
-			stmt.Expression, newStmtContext(ctx, ov.File, allowReturn).newExpr(),
+			stmt.Expression, newStmtContext(ctx, ov.File, true, 0).newExpr(),
 		)
 		ov.Return, retRange = bodyExpr.Type, stmt.Expression.GetRange()
 	case isInit:
@@ -261,7 +261,7 @@ func (c *Checker) checkOverload(ov *Overload, fnObj *Object) {
 				bodyExpr = c.checkExpr(
 					stmt.Expression,
 					// Create a stmtCtx to alloow 'try' and function calls
-					newStmtContext(ctx, ov.File, allowReturn).newExpr().withHint(ov.Return),
+					newStmtContext(ctx, ov.File, true, 0).newExpr().withHint(ov.Return),
 				)
 				if ov.Return == nil {
 					ov.Return = bodyExpr.Type
@@ -419,19 +419,28 @@ func (c *Checker) checkInitReturnType(
 func (c *Checker) checkFuncBody(stmt *ast.FunctionDeclaration, ov *Overload,
 	fn *Function, retRange ranges.Range, fctx *Context,
 ) {
-	sctx := newStmtContext(ov.InnerContext, ov.File, allowReturn)
-	sctx.returnHint = ov.Return
+	sctx := newStmtContext(ov.InnerContext, ov.File, true, 0)
+	sctx.returnCtx.hint = ov.Return
 	c.recordBlock(stmt.Body, sctx)
 	c.checkBlock(stmt.Body.Body, sctx)
 
 	// Ensure return statements are present, or the function never returns
 	// (similar to Go's rules). They aren't needed if:
 	// - The return type is Nothing
-	// - The function crashouts or has a TODO, or
+	// - The function crashouts or has a TODO
+	// - The function ends in an infinite loop, or
 	// - The function is an initializer (TODO: warn about a missing return
 	// if 'self' isn't mutated)
 	if ov.Return.Kind() != NothingType && sctx.flags&unreachableStmt == 0 &&
 		ov.info.funcKind != initFunc {
+		// Show a better error if the function ends in a 'when' statement, indicating
+		// which cases don't return or if the cases aren't exhaustive. TODO
+		if len(stmt.Body.Body) > 0 {
+			if stmt, ok := stmt.Body.Body[len(stmt.Body.Body)-1].(*ast.ExpressionStatement); ok {
+				if _, ok := stmt.Expression.(*ast.WhenExpression); ok {
+				}
+			}
+		}
 		err := klarerrs.Position(klarerrs.ErrMissingReturn, stmt.Body.Range.End)
 		err.Label = "The body doesn't end in a 'return' statement"
 		err.Name = ov.Return.String()
@@ -444,7 +453,7 @@ func (c *Checker) checkFuncBody(stmt *ast.FunctionDeclaration, ov *Overload,
 	}
 
 	// Check that all returned values are compatible with the expected type
-	for _, ret := range *sctx.returns {
+	for _, ret := range sctx.returnCtx.returns {
 		if !Compatible(ret.expr.Type, ov.Return) && ret.expr.Type.Kind() != InvalidType {
 			// TODO: If implicitNothing, show a more helpful message that explicit
 			// returns are needed

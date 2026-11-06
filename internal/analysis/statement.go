@@ -13,11 +13,19 @@ import (
 
 type stmtContext struct {
 	ctx        *Context
-	returns    *[]returnStmt
-	returnHint Type
 	loopLabels map[string]*loopLabel
 	flags      stmtFlags
 	collector  *stmtCollector
+
+	// The block 'next' and 'stop' without labels refer to
+	nextStopCtx *stmtContext
+	returnCtx   *returnContext // Nil if returns aren't allowed
+}
+
+type returnContext struct {
+	stmtCtx *stmtContext
+	returns []returnStmt
+	hint    Type
 }
 
 type returnStmt struct {
@@ -26,55 +34,69 @@ type returnStmt struct {
 }
 
 type loopLabel struct {
-	pos  ranges.Range
-	used bool
-	node ast.Node // 'for', 'while', or 'when'
+	pos     ranges.Range
+	used    bool
+	node    ast.Node // 'for', 'while', or 'when'
+	stmtCtx *stmtContext
 }
 
 type stmtFlags uint16
 
 const (
-	allowReturn     stmtFlags = 1 << iota // Function body
-	allowNextStop                         // Allow 'next' and 'stop' (for/while/when)
+	allowNextStop   stmtFlags = 1 << iota // Allow 'next' and 'stop' (for/while/when)
 	finalWhenCase                         // Disallow 'next'
 	unreachableStmt                       // After an expr/stmt that doesn't return (return/stop/next/crashout)
 	braceless                             // Body of a braceless 'when' case
 	allowForwardDecl
 	whenStmt
 
-	containsStop
-	containsNext
-	containsReturn
+	containsStop   // Applied to the current [stmtContext] and [stmtContext.stopCtx]
+	containsNext   // Applied to the current [stmtContext] and [stmtContext.nextCtx]
+	containsReturn // Applied to the nearest [stmtContext] only
+
+	inheritedLoopLabels // Clone [stmtContext.loopLabels] when a new label is defined
 )
 
-func newStmtContext(ctx *Context, fid FileID, flags stmtFlags) *stmtContext {
-	return &stmtContext{
-		ctx:        ctx,
-		flags:      flags,
-		returns:    new([]returnStmt),
-		loopLabels: make(map[string]*loopLabel),
-		collector:  &stmtCollector{ctx: ctx, fid: fid},
+func newStmtContext(ctx *Context, fid FileID, allowReturn bool, flags stmtFlags) *stmtContext {
+	sctx := &stmtContext{
+		ctx:       ctx,
+		flags:     flags,
+		collector: &stmtCollector{ctx: ctx, fid: fid},
 	}
+	if allowReturn {
+		sctx.returnCtx = &returnContext{stmtCtx: sctx}
+	}
+	return sctx
 }
 
 func newChildStmtContext(parentSctx *stmtContext,
 	childCtx *Context, flags stmtFlags,
 ) *stmtContext {
 	if parentSctx == nil {
-		return newStmtContext(childCtx, childCtx.File, flags)
+		return newStmtContext(childCtx, childCtx.File, false, flags)
 	}
-	return &stmtContext{
-		ctx:        childCtx,
-		returns:    parentSctx.returns,
-		loopLabels: maps.Clone(parentSctx.loopLabels),
-		flags:      parentSctx.flags | flags,
-		collector:  &stmtCollector{ctx: childCtx, fid: childCtx.File},
+	sctx := &stmtContext{
+		ctx:         childCtx,
+		flags:       parentSctx.flags | flags | inheritedLoopLabels,
+		collector:   &stmtCollector{ctx: childCtx, fid: childCtx.File},
+		loopLabels:  parentSctx.loopLabels,
+		nextStopCtx: parentSctx.nextStopCtx,
+		returnCtx:   parentSctx.returnCtx,
 	}
+	// This is only run if defined for the new context, not inherited
+	if (flags & allowNextStop) != 0 {
+		sctx.nextStopCtx = sctx
+	}
+	return sctx
 }
 
 func (sctx *stmtContext) fid() FileID { return sctx.ctx.File }
 func (sctx *stmtContext) newChildContext() *Context {
 	return NewContext(sctx.ctx, sctx.ctx.File)
+}
+
+func (sctx *stmtContext) returnsAllowed() bool {
+	return sctx != nil && sctx.returnCtx != nil
 }
 
 // Reports an error if the label already exists
@@ -99,7 +121,15 @@ func (sctx *stmtContext) declareLabel(name string, r ranges.Range, node ast.Node
 		err.AddDetail("It was already defined here", "", other.pos)
 		return err
 	}
-	sctx.loopLabels[name] = &loopLabel{pos: r, node: node}
+	// Lazy-clone the loop labels
+	if (sctx.flags & inheritedLoopLabels) != 0 {
+		sctx.loopLabels = maps.Clone(sctx.loopLabels)
+		sctx.flags &^= inheritedLoopLabels
+	}
+	if sctx.loopLabels == nil {
+		sctx.loopLabels = make(map[string]*loopLabel)
+	}
+	sctx.loopLabels[name] = &loopLabel{pos: r, node: node, stmtCtx: sctx}
 	return nil
 }
 
@@ -269,7 +299,7 @@ func (c *Checker) validateExprStmt(stmt *ast.ExpressionStatement, expr *Expr) {
 	addHints := func(err *klarerrs.Error) {
 		// If we have something like `func x() -> Int { 2 }`, recommend
 		// returning it if it's compatible
-		if sctx.returnHint != nil && Compatible(expr.Type, sctx.returnHint) {
+		if rc := sctx.returnCtx; rc != nil && rc.hint != nil && Compatible(expr.Type, rc.hint) {
 			hintWithDiff(
 				err, "Did you mean to return this value?", klarerrs.AddedString{
 					Pos:    stmt.Range.Start,
@@ -316,13 +346,16 @@ func (c *Checker) validateExprStmt(stmt *ast.ExpressionStatement, expr *Expr) {
 }
 
 func (c *Checker) checkReturnStmt(stmt *ast.ReturnStatement, sctx *stmtContext) {
-	if sctx == nil || sctx.flags&allowReturn == 0 {
+	var returnHint Type
+	if !sctx.returnsAllowed() {
 		// TODO: hint if func () = when {...}
 		err := klarerrs.Node(klarerrs.ErrReturnOutsideFunc, stmt)
 		err.Label = "This 'return' statement is outside of a function"
 		c.fileError(err, sctx.ctx.File)
+	} else {
+		returnHint = sctx.returnCtx.hint
 	}
-	e := sctx.newExpr().withHint(sctx.returnHint)
+	e := sctx.newExpr().withHint(returnHint)
 	var pos ranges.Range
 	if stmt.Value == nil {
 		e.Type = NothingType
@@ -332,7 +365,7 @@ func (c *Checker) checkReturnStmt(stmt *ast.ReturnStatement, sctx *stmtContext) 
 		pos = stmt.Value.GetRange()
 		// 'return try ...' is redundant, similar to an error check as a return value
 		if try, ok := stmt.Value.(*ast.TryExpression); ok {
-			tryRange := ranges.Offset(try.Range.Start, 0, uint32(len(lexer.Try.String())))
+			tryRange := ranges.Offset(try.Range.Start, 0, uint32(len("try")))
 			warn := klarerrs.Range(klarerrs.WarnRedundantReturnTry, tryRange).MarkWarning()
 			warn.Label = "This 'try' is redundant"
 			hintWithDiff(
@@ -344,8 +377,12 @@ func (c *Checker) checkReturnStmt(stmt *ast.ReturnStatement, sctx *stmtContext) 
 			c.fileError(warn, sctx.fid())
 		}
 	}
-	sctx.flags |= unreachableStmt | containsReturn
-	*sctx.returns = append(*sctx.returns, returnStmt{expr: e, pos: pos})
+	if sctx.returnCtx == nil {
+		return
+	}
+	sctx.flags |= unreachableStmt /* | containsReturn */
+	sctx.returnCtx.stmtCtx.flags |= containsReturn
+	sctx.returnCtx.returns = append(sctx.returnCtx.returns, returnStmt{expr: e, pos: pos})
 }
 
 func (c *Checker) inferReturnType(returns []returnStmt) Type {
@@ -416,6 +453,7 @@ func (c *Checker) checkWhileStmt(stmt *ast.WhileStatement, sctx *stmtContext) {
 		}
 	}
 
+	var isWhileTrue bool
 	if stmt.Condition != nil {
 		cond := c.checkExpr(stmt.Condition, sctx.newExpr())
 		if typ := cond.Type; typ.Kind() != BoolType && typ.Kind() != InvalidType {
@@ -426,6 +464,8 @@ func (c *Checker) checkWhileStmt(stmt *ast.WhileStatement, sctx *stmtContext) {
 			)
 			err.Label = "This has type " + quote(gotType)
 			c.fileError(err, sctx.ctx.File)
+		} else {
+			isWhileTrue = isConstant(cond.Type) && cond.ConstExpr().Value == BoolConst(true)
 		}
 	}
 	// Optional loop label
@@ -438,8 +478,13 @@ func (c *Checker) checkWhileStmt(stmt *ast.WhileStatement, sctx *stmtContext) {
 	bodySctx := newChildStmtContext(sctx, bodyCtx, allowNextStop)
 	c.recordBlock(stmt.Body, bodySctx)
 	c.checkBlock(stmt.Body.Body, bodySctx)
-	// TODO: Mark the sctx as unreachable if there is no condition or it is 'true',
-	// and there is no 'stop' in the body.
+
+	// Mark the containing sctx as unreachable if the loop has no condition and is
+	// never broken. Even if there is a return in the loop, the statements outside
+	// the loop are still unreachable.
+	if (stmt.Condition == nil || isWhileTrue) && bodySctx.flags&containsStop == 0 {
+		sctx.flags |= unreachableStmt
+	}
 }
 
 func (c *Checker) checkControlStmt(stmt ast.Statement,
@@ -450,17 +495,8 @@ func (c *Checker) checkControlStmt(stmt ast.Statement,
 		c.fileError(klarerrs.Node(klarerrs.ErrMisplacedControlStmt, stmt), fid)
 		return
 	}
-	if sctx.flags&finalWhenCase != 0 && isNext {
-		err := klarerrs.Node(klarerrs.ErrNextInLastWhenCase, stmt)
-		err.Hint("The 'next' statement in a 'when' case checks the remaining cases in the 'when' expression, but there are no more cases.")
-		c.fileError(err, fid)
-	}
 
-	if isNext {
-		sctx.flags |= containsNext | unreachableStmt
-	} else {
-		sctx.flags |= containsStop | unreachableStmt
-	}
+	target := sctx.nextStopCtx
 	if label != nil {
 		labelDef, ok := sctx.loopLabels[label.Name]
 		if !ok {
@@ -475,7 +511,28 @@ func (c *Checker) checkControlStmt(stmt ast.Statement,
 			return
 			// TODO: More specific error if the label is in an outside function
 		}
+		target = labelDef.stmtCtx
 		labelDef.used = true
+	}
+	// Apply containsNext/Stop to the current block and the block that is
+	// being controlled
+	if isNext {
+		sctx.flags |= containsNext | unreachableStmt
+		target.flags |= containsNext
+	} else {
+		sctx.flags |= containsStop | unreachableStmt
+		target.flags |= containsStop
+	}
+	if isNext && target.flags&finalWhenCase != 0 {
+		err := klarerrs.Node(klarerrs.ErrNextInLastWhenCase, stmt)
+		err.Hint("The 'next' statement in a 'when' case checks the remaining cases in the 'when' expression, but there are no more cases.")
+		if label != nil {
+			err.AddDetailf(
+				c.Module.ResolveFilePath(target.fid()), sctx.loopLabels[label.Name].pos,
+				"Label ':%s' refers to this", label.Name,
+			)
+		}
+		c.fileError(err, fid)
 	}
 }
 

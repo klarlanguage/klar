@@ -73,12 +73,17 @@ func (pc *patternChecker) fid() FileID { return pc.pat.FileID() }
 func (c *Checker) checkWhenExpr(expr *ast.WhenExpression, t *Expr) {
 	t.Type = t.hint
 	fid := t.FileID()
-	subjects := make([]*whenSubject, len(expr.Subjects))
+	subjects := make([]*whenSubject, max(len(expr.Subjects), 1))
 	for i, subj := range expr.Subjects {
 		e := c.checkExprFrom(subj, t)
 		e.Type = c.toTyped(e.Type, nil, subj, fid)
 		subjects[i] = &whenSubject{Expr: e, Node: subj}
 	}
+	if len(expr.Subjects) == 0 {
+		// Implicit `when true` (see docs for [*whenSubject.IsImplicitTrue])
+		subjects[0] = newImplicitTrueSubject(t.Context) // Not bodyCtx
+	}
+	allReturn := len(expr.Cases) > 0
 	nilChecks := make(map[int]int, len(subjects)) // Subject index: Case index
 	for caseI, cs := range expr.Cases {
 		bodyCtx := NewContext(t.Context, fid)
@@ -102,6 +107,9 @@ func (c *Checker) checkWhenExpr(expr *ast.WhenExpression, t *Expr) {
 		//  }
 		// `a` must be declared, with the same type, across all options (`|`)
 		for _, subj := range subjects {
+			if subj.IsImplicitTrue() {
+				break
+			}
 			vars := c.checkCommonPatternVars(subj.Options)
 			// Declare the variables into the body's context
 			for name, wv := range vars {
@@ -132,7 +140,14 @@ func (c *Checker) checkWhenExpr(expr *ast.WhenExpression, t *Expr) {
 		}
 
 		// Body
-		c.checkWhenBody(expr, caseI, bodyCtx, t)
+		if bodyReturns := c.checkWhenBody(expr, caseI, bodyCtx, t); !bodyReturns {
+			allReturn = false
+		}
+	}
+	isExhaustive := c.checkWhenExhaustiveness(expr, subjects, t.mode.has(exprStmt), fid)
+	// TODO: Apply this only if the 'when' is exhaustive
+	if isExhaustive && allReturn && t.stmtCtx != nil {
+		t.stmtCtx.flags |= unreachableStmt
 	}
 }
 
@@ -142,13 +157,7 @@ func (c *Checker) checkWhenOptions(expr *ast.WhenExpression, subjects []*whenSub
 	cs := expr.Cases[caseI]
 	for _, opt := range cs.Options { // Separated by '|'
 		for subjI, patExpr := range opt { // Separated by ','
-			var ws *whenSubject
-			if len(subjects) == 0 {
-				// Implicit `when true` (see docs for [*whenSubject.IsImplicitTrue])
-				ws = newImplicitTrueSubject(t.Context) // Not bodyCtx
-			} else {
-				ws = subjects[subjI]
-			}
+			ws := subjects[subjI]
 			pat := c.checkWhenPattern(ws, patExpr)
 			ws.Options = append(ws.Options, pat)
 			// Record the type of the pattern expression as a [*WhenPattern]
@@ -181,6 +190,9 @@ func (c *Checker) performWhenSmartCasts(
 	subjects []*whenSubject, nilChecks map[int]int, caseI int, bodyCtx *Context,
 ) {
 	for subjI, subj := range subjects {
+		if subj.IsImplicitTrue() {
+			break
+		}
 		og, ok := subj.Type.(*Object)
 		if !ok {
 			// Unfortunately, we can only smart-cast variables. See
@@ -220,7 +232,7 @@ func (c *Checker) declareWhenPatternAliases(
 	subjects []*whenSubject, vars []ast.Identifier, bodyCtx *Context,
 ) {
 	for i, name := range vars {
-		if len(subjects) == 0 {
+		if subjects[0].IsImplicitTrue() {
 			// Implicit `when true` can't declare variables because they
 			// will always be `true`. TODO: Error
 			break
@@ -247,12 +259,8 @@ func (c *Checker) declareWhenPatternAliases(
 
 func (c *Checker) checkWhenBody(
 	expr *ast.WhenExpression, caseI int, bctx *Context, whenExpr *Expr,
-) {
+) (returns bool) {
 	cs := expr.Cases[caseI]
-	stmtFlags := allowNextStop
-	if caseI == len(expr.Cases)-1 {
-		stmtFlags |= finalWhenCase // Forbid 'next' in the final case
-	}
 	// If this 'when' block is an expression, each body must be an expression.
 	// Blocks aren't allowed, and the only statements allowed are control statements
 	switch body := cs.Body.(type) {
@@ -264,13 +272,19 @@ func (c *Checker) checkWhenBody(
 			c.fileError(err, whenExpr.FileID())
 			// We will still check the body
 		}
+		stmtFlags := allowNextStop
+		if caseI == len(expr.Cases)-1 {
+			stmtFlags |= finalWhenCase // Forbid 'next' in the final case
+		}
 		sctx := newChildStmtContext(whenExpr.stmtCtx, bctx, stmtFlags)
 		c.recordBlock(body, sctx)
 		c.checkBlock(body.Body, sctx)
+		return (sctx.flags & unreachableStmt) != 0
 	case ast.Statement:
-		sctx := newChildStmtContext(whenExpr.stmtCtx, bctx, stmtFlags|braceless)
+		sctx := newChildStmtContext(whenExpr.stmtCtx, bctx, braceless)
 		c.recordBlock(body, sctx)
 		c.checkStmt(body, sctx)
+		return (sctx.flags & unreachableStmt) != 0
 	case ast.Expression:
 		bodyExpr := NewExpr(bctx, allowNothingValue).withHint(whenExpr.hint)
 		// Allow functions that return Nothing to be used as bodies in
@@ -278,10 +292,21 @@ func (c *Checker) checkWhenBody(
 		if whenExpr.mode.has(exprStmt) {
 			bodyExpr.mode |= exprStmt
 		}
+		// TODO: Since we're not using a separate sctx, a case body that crashouts
+		// will make the statements after the 'when' block unreachable. So set it
+		// back to normal. But is this needed? This won't even work if there is no sctx.
+		if bodyExpr.stmtCtx != nil {
+			oldStmtFlags := whenExpr.stmtCtx.flags
+			defer func() {
+				returns = (whenExpr.stmtCtx.flags & unreachableStmt) != 0
+				if (oldStmtFlags & unreachableStmt) == 0 {
+					whenExpr.stmtCtx.flags &^= unreachableStmt
+				}
+			}()
+		}
 		bodyExpr.stmtCtx = whenExpr.stmtCtx
 		c.checkExpr(body, bodyExpr)
-		if bodyExpr.Kind() == NothingType {
-		} else if !whenExpr.mode.has(exprStmt) {
+		if bodyExpr.Kind() != NothingType && !whenExpr.mode.has(exprStmt) {
 			// When the 'when' is being used as an expression, the bodies must
 			// have the same type.
 			prevBodyType := whenExpr.Type
@@ -299,6 +324,9 @@ func (c *Checker) checkWhenBody(
 				},
 			)
 		}
+		return returns
+	default:
+		panic("unreachable")
 	}
 }
 
@@ -313,6 +341,7 @@ func (c *Checker) checkWhenPattern(ws *whenSubject, expr ast.Expression) *WhenPa
 		c.checkImplicitTrueWhenPattern(expr, pat)
 		return pat
 	}
+	// TODO: Use a global pool?
 	pc := &patternChecker{Checker: c, pat: pat, subj: ws}
 
 	switch expr := expr.(type) {
