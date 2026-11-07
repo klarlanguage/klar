@@ -29,7 +29,7 @@ func NewExpr(ctx *Context, flags ...exprMode) *Expr {
 }
 
 func (e *Expr) NewChild(flags ...exprMode) *Expr {
-	const noInherit = 0
+	const noInherit = exprStmt | indexLHS
 	return &Expr{
 		Context: e.Context,
 		mode:    (e.mode &^ noInherit) | parseFlags(flags),
@@ -59,18 +59,19 @@ type exprMode uint16
 
 const (
 	// Input modes
-	typeInit  exprMode = 1 << iota
-	constExpr          // Can also be output
-	exprStmt
-	patternMatch
-	indexLHS
-	stringInterpolation
-	allowNothingValue
-	attributeFunc
+
+	// Require the expression to be constant
+	constExpr           exprMode = 1 << iota
+	exprStmt                     // Allow functions returning Nothing and inexhaustive 'when' blocks
+	patternMatch                 // Allow more nodes such as discards
+	indexLHS                     // Allow the expression to be an enum type
+	stringInterpolation          // Disallow certain nodes
+	attributeFunc                // Allow version literals
+	allowNothingValue            // Allow the expression to have type Nothing
 
 	// Output modes
-	todoExpr
-	intfField
+	todoExpr  // Expression contains a TODO() call
+	intfField // Disallow assigning to the expression
 )
 
 func (mode exprMode) has(opt exprMode) bool { return (mode & opt) != 0 }
@@ -816,6 +817,8 @@ func (c *Checker) checkBinaryOperation(op ast.Operator, lhs, rhs Type,
 		default:
 			err := klarerrs.Node(klarerrs.ErrInvalidInOperand, rhsNode)
 			err.Label = "This has type " + quote(rhs.String())
+			err.Name = op.String()
+			c.fileError(err, fid)
 		}
 	default:
 		panic(fmt.Sprintf("unhandled binary operator: %q", op))

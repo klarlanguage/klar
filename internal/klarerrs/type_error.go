@@ -34,6 +34,7 @@ const (
 	ErrMissingReturn          // Function doesn't return Nothing but contains no return statements
 	ErrMissingReturnInWhen    // Missing return caused by not all 'when' cases returning
 	ErrPrivateAttributes      // @deprecated and @added attributes aren't allowed on private declarations
+	ErrInvalidEnumValue       // Enum value must be a string, bool, or number
 
 	// Type expression ====
 
@@ -79,7 +80,6 @@ const (
 	ErrNonConstStringRange  // Range bounds must be constants when ranging over String
 	ErrOpenStringRange      // '..<' not allowed with range over String
 	ErrNonLetterStringRange // Bounds of range over String must be a letter or digit
-	ErrMultiCharStringRange // Bounds of range over String must be a single character
 	ErrInvalidIndexType     // Can't index this type
 	ErrNilMapIndex          // Indexing a map using a 'none' literal is always a 'none' value
 	ErrNonNumericIndex      // Index for list/String/tuple must be Int
@@ -116,7 +116,8 @@ const (
 	ErrNestedTupleStrMatch // Nested tuples not allowed in
 	ErrRedundantStrMatch   // Explicit type of String provided in string pattern match
 	ErrWhenTrueMismatch    // Cases of a 'when' block without subjects must have type Bool
-	ErrWhenSubjectRequired
+	ErrWhenSubjectRequired // Patterns with an implicit LHS require a 'when' subject
+	ErrNonCommonWhenVars   // Each pattern in a 'when' case must define the same variables
 
 	// Call ====
 
@@ -216,7 +217,7 @@ func (e *Error) handleTypeError() string {
 	case ErrStepWithStringRange:
 		return "A step can't be specified when ranging over type String"
 	case ErrNonConstStringRange:
-		return "The bounds of a range over String must be constants"
+		return "The bounds of a range over String must be known at compile-time"
 	case ErrOpenStringRange:
 		return "'..<' can't be used when ranging over type String"
 	case ErrMismatchTupleDestruct:
@@ -247,7 +248,13 @@ func (e *Error) handleTypeError() string {
 	case ErrDotIndexRequired:
 		return "Type " + Quote(e.Name) + "'s fields must be accessed via a dot-index"
 	case ErrInvalidArithType:
-		return "The " + Quote(e.Name) + " operator is only supported with numeric operands"
+		var stringTimesInt string
+		if e.Name == "*" {
+			// Make the message factually correct
+			stringTimesInt = ", or with 'String * Int'"
+		}
+		return "The " + Quote(e.Name) + " operator is only supported with numeric operands" +
+			stringTimesInt
 	case ErrInvalidStringMult:
 		return "Type String can only be multiplied by Int"
 	case ErrFieldAndMethodSameName:
@@ -306,7 +313,8 @@ func (e *Error) handleTypeError() string {
 	case ErrOperandTypeMismatch:
 		return "Both operands of '" + e.Name + "' must have the same type"
 	case ErrInvalidAdditionType:
-		return "Can't add two " + e.Name + "s together"
+		e.Hint("Addition is supported on Ints, Floats, Strings, lists, and maps.")
+		return "Can't add two '" + e.Name + "'s together"
 	case ErrOptionalMap:
 		return "The type of a map's key or value can't be optional"
 	case ErrNilMapIndex:
@@ -371,5 +379,23 @@ func (e *Error) handleTypeError() string {
 		return "Not all cases in this 'when' statement return"
 	case ErrInvalidAssignType:
 		return "You can't assign to " + WithA(e.Name)
+	case ErrInvalidEnumValue:
+		return "An enum item's value must be a String, Int, or Float"
+	case ErrAssignToReadonly:
+		return "Can't assign to a readonly struct field"
+	case ErrRestUncommonTuple:
+		return "You can only rest a tuple with items of the same type"
+	case ErrPrivateAttributes:
+		return "The '@" + e.Name + "' attribute can only be used on declarations that are public"
+	case ErrNonLetterStringRange:
+		return "A bound of a range over String must be a single Latin letter or number"
+	case ErrCantInferStringEnum:
+		return "I can't infer the value of this enum item because the other items don't have a consistent naming pattern"
+	case ErrNotANamespace:
+		return Quote(e.Name) + " isn't a namespace"
+	case ErrUncommonReturnType:
+		return "The values returned by a function must have a common type"
+	case ErrInvalidInOperand:
+		return "The right-hand side of " + Quote(e.Name) + " must be a list, map, or String"
 	}
 }

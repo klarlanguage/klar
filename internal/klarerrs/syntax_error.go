@@ -136,6 +136,7 @@ const (
 	ErrInvalidLoop  // Invalid loop kind in 'next' or 'stop' statement
 	ErrPositiveSign // Leading '+' sign not allowed in Klar
 	ErrDoubleNot    // Double '!!' not allowed in Klar
+	ErrDoubleNegate // Consecutive '-' are redundant
 
 	// Analysis-time syntax errors =====
 
@@ -160,7 +161,8 @@ const (
 	ErrMisplacedRest          // Rest expression used outside of list, call, tuple, or map
 	ErrReturnInPipelineExpr   // Return statement not allowed in pipeline expression
 	ErrOptionalOptional       // Can't nest optional types (T??)
-	ErrMultipleDefault        // Multiple default ('_') 'when' cases
+	ErrMultipleDefault        // Multiple default ('_') 'when' cases. Deprecated
+	ErrDuplicateWhenPattern   // The same pattern was already matched (without fallthrough)
 	ErrStringInSegmentMatch   // Expression in '...expr' when pattern must be a string
 	ErrLabelledParamLast      // Positional params must go before labelled params
 	ErrInvalidWhenPattern     // Invalid when pattern syntax used
@@ -470,7 +472,14 @@ func (e *Error) handleSyntaxError() string {
 		} else {
 			e.Hint("Keep only one of them.")
 		}
-		return "Multiple '!' are not allowed"
+		return "Can't negate ('!') an expression multiple times"
+	case ErrDoubleNegate:
+		if e.IntParam("count")%2 == 0 {
+			e.Hint("Remove all of them.")
+		} else {
+			e.Hint("Keep only one of them.")
+		}
+		return "Can't negate ('-') an expression multiple times"
 	case ErrInvalidForExprOperator:
 		return "Expected '->', an arithmetic assignment, or block in 'for' expression"
 	case ErrMisplacedBOM:
@@ -559,6 +568,8 @@ func (e *Error) handleSyntaxError() string {
 			msg = " for this subject"
 		}
 		return msg
+	case ErrDuplicateWhenPattern:
+		return "This pattern was already matched in the 'when' block"
 	case ErrMisplacedRest:
 		return "A rest can only be used in a call or collection"
 	case ErrInvalidWhenPattern:
@@ -594,5 +605,7 @@ func (e *Error) handleSyntaxError() string {
 		return "The " + Quote(e.Name) + " field was already provided, without a label"
 	case ErrAmbiguousLogicalChain:
 		return "Mixing '&&' and '||' in a chain is ambiguous"
+	case ErrStringInSegmentMatch:
+		return "'...' patterns can only be used with strings"
 	}
 }

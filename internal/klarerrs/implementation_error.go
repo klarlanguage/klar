@@ -21,9 +21,13 @@ func (e *Error) handleImplementationError() string {
 	default:
 		e.noMessage()
 		return ""
+
 	case ErrReservedJSKeyword:
 		return Quote(e.Name) + " is a reserved keyword in JavaScript and can't be used as a name"
 	case ErrConstructorName:
 		return Capitalize(WithA(e.Name)) + " can't be named 'constructor' in JavaScript"
+	case ErrInvalidJSName:
+		e.Hint("An identifier in JavaScript can be any Klar identifer or keyword that isn't reserved in JavaScript. They can also contain '$'.")
+		return Quote(e.Name) + " isn't a valid JavaScript identifier"
 	}
 }

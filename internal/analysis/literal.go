@@ -125,7 +125,7 @@ func (c *Checker) checkStringLiteral(expr *ast.StringLiteral, t *Expr) {
 		// And disallow certain expression nodes (using an exprMode)
 		e := c.checkExprFrom(interp.Expression, t, stringInterpolation)
 		// A string is constant if all interpolations are constant
-		if !e.gotMode.has(constExpr) {
+		if !isConstant(e.Type) {
 			isConst = false
 		}
 		c.checkStringInterpolation(interp.Expression, e)

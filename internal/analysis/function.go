@@ -211,12 +211,11 @@ func (c *Checker) checkOverload(ov *Overload, fnObj *Object) {
 		ov.Return, retRange = bodyExpr.Type, stmt.Expression.GetRange()
 	case isInit:
 		// `func Int()` implicitly returns Int
-		ov.Return, retRange = info.receiver.TypeName(), stmt.Identifier.Range()
+		ov.Return, retRange = info.receiver, stmt.Identifier.Range()
 	default:
 		// No explicit return type means Nothing is returned
 		ov.Return, retRange = NothingType, stmt.Range
 		implicitNothing = true
-		_ = implicitNothing
 	}
 
 	// Ensure the return type is the same across all overloads. This
@@ -251,7 +250,7 @@ func (c *Checker) checkOverload(ov *Overload, fnObj *Object) {
 
 	// 5. Body
 	if !c.Options.IgnoreFuncBodies && stmt.Body != nil {
-		c.queue(func() { c.checkFuncBody(stmt, ov, fn, retRange, fctx) }, true)
+		c.queue(func() { c.checkFuncBody(stmt, ov, implicitNothing, retRange) }, true)
 	} else if stmt.Expression != nil {
 		// This is queued because a function body's returns are also queued.
 		// TODO: This is for consistency, but is this needed?
@@ -417,7 +416,7 @@ func (c *Checker) checkInitReturnType(
 
 // fn could be nil if the overload is an initializer
 func (c *Checker) checkFuncBody(stmt *ast.FunctionDeclaration, ov *Overload,
-	fn *Function, retRange ranges.Range, fctx *Context,
+	implicitNothing bool, retRange ranges.Range,
 ) {
 	sctx := newStmtContext(ov.InnerContext, ov.File, true, 0)
 	sctx.returnCtx.hint = ov.Return
@@ -455,9 +454,18 @@ func (c *Checker) checkFuncBody(stmt *ast.FunctionDeclaration, ov *Overload,
 	// Check that all returned values are compatible with the expected type
 	for _, ret := range sctx.returnCtx.returns {
 		if !Compatible(ret.expr.Type, ov.Return) && ret.expr.Type.Kind() != InvalidType {
-			// TODO: If implicitNothing, show a more helpful message that explicit
-			// returns are needed
 			err := returnTypeMismatch(ret.expr.Type, ov.Return, ret.pos, retRange)
+			// If implicitNothing, show a more helpful message that explicit
+			// returns are needed.
+			if implicitNothing {
+				hintWithDiff(err,
+					"You didn't explicitly declare a return type for this function. Klar requires them, otherwise the function is expected to return 'Nothing'. If you want the function to return this type, declare it in its signature.",
+					klarerrs.AddedString{
+						Pos:    stmt.Body.Range.Start,
+						String: "-> " + ret.expr.Type.String() + " ",
+					},
+				)
+			}
 			c.fileError(err, ov.File)
 		}
 	}
@@ -473,12 +481,12 @@ func returnTypeMismatch(got, exp Type, gotRange, expRange ranges.Range) *klarerr
 	return err
 }
 
-func (c *Checker) parseGenerics(names []ast.Identifier,
-	fid FileID, ctx *Context,
-) []*Generic {
+func (c *Checker) parseGenerics(names []ast.Identifier, fid FileID, ctx *Context) []*Generic {
 	generics := make([]*Generic, len(names))
 	for i, param := range names {
-		genObj := NewObject(param.Name, fid, param.Range(), c.Module, &TypeName{Name: param.Name})
+		genObj := NewObject(
+			param.Name, fid, param.Range(), c.Module, &TypeName{Name: param.Name},
+		)
 		gen := newGeneric(genObj, i)
 		c.declare(ctx, genObj)
 		generics[i] = gen
@@ -515,7 +523,8 @@ func (fn *Function) StringWithName(name string) string {
 		b.WriteString(name)
 	}
 	b.WriteString("(...)")
-	if fn.Return != nil && fn.Return.Kind() != NothingType && fn.Return.Kind() != InvalidType {
+	if fn.Return != nil &&
+		fn.Return.Kind() != NothingType && fn.Return.Kind() != InvalidType {
 		b.WriteString(" -> ")
 		b.WriteString(fn.Return.String())
 	}

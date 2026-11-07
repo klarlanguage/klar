@@ -286,6 +286,7 @@ func (c *Checker) checkWhenBody(
 		c.checkStmt(body, sctx)
 		return (sctx.flags & unreachableStmt) != 0
 	case ast.Expression:
+		// TODO: Allow crashout() calls and functions that don't return
 		bodyExpr := NewExpr(bctx, allowNothingValue).withHint(whenExpr.hint)
 		// Allow functions that return Nothing to be used as bodies in
 		// 'when' statements

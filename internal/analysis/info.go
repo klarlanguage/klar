@@ -20,10 +20,13 @@ type Block struct {
 }
 
 func (c *Checker) recordBlock(node ast.Node, sctx *stmtContext) {
-	c.Module.Info.Blocks[node] = &Block{
+	block := &Block{
 		Context:        sctx.ctx,
-		Returns:        &sctx.returnCtx.returns,
 		Flags:          sctx.flags,
 		HasControlFlow: false, // TODO
 	}
+	if sctx.returnCtx != nil {
+		block.Returns = &sctx.returnCtx.returns
+	}
+	c.Module.Info.Blocks[node] = block
 }

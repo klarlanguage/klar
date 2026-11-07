@@ -203,9 +203,7 @@ type RegexConst struct {
 }
 
 func (r RegexConst) ConstValue() any { return r }
-func (r RegexConst) String() string {
-	return "#/" + r.Pattern + "/" + r.Flags
-}
+func (r RegexConst) String() string  { return "#/" + r.Pattern + "/" + r.Flags }
 
 type EnumConst struct {
 	Item *EnumItem

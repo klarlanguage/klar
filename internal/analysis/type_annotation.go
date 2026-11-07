@@ -127,8 +127,8 @@ func (c *Checker) checkGenericCount(o *Object, r ranges.Range, flags Flag, fid F
 func (c *Checker) parseQualifiedTypeAlias(expr *ast.QualifiedTypeAlias,
 	ctx *Context, flags Flag,
 ) Type {
-	nsObj := ctx.LookupRecursive(expr.Namespace.Name)
 	nsIdent := expr.Namespace
+	nsObj := ctx.LookupRecursive(nsIdent.Name)
 	if nsObj == nil {
 		c.fileError(klarerrs.Undefined(nsIdent.Name, nsIdent.Range()), ctx.File)
 		return InvalidType
@@ -138,6 +138,7 @@ func (c *Checker) parseQualifiedTypeAlias(expr *ast.QualifiedTypeAlias,
 	if !ok {
 		// In `x.y`, 'x' isn't a namespace
 		err := klarerrs.Node(klarerrs.ErrNotANamespace, nsIdent)
+		err.Name = nsIdent.Name
 		err.Label = fmt.Sprintf(
 			"%s is %s, not a namespace",
 			quote(nsIdent.Name), klarerrs.WithA(kindOf(nsObj.Type)),

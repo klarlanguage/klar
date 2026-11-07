@@ -18,7 +18,7 @@ func Parser.advance() -> (current: Token) {
 }
 
 func (parser: Parser).parse() -> Result<Program, [SyntaxError]> {
-    program := Program(commands: [], comments: parser.comments)
+    program := Program(commands: [], :parser.comments)
     errors: [SyntaxError] := []
     while parser.hasTokens() :loop {
         cmd := parser.parseCommand()

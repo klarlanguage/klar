@@ -16,7 +16,7 @@ type Enum struct {
 	Inherited    map[Type]struct{} // Enums and tags
 	Items        []*EnumItem
 	itemMap      map[string]*EnumItem
-	Union        *EnumItem // Params in common with all items. Can be nil
+	CommonParams map[string]Type // Params in common with all items. Can be nil
 	Generics     []*Generic
 	origin       *Enum     // Without initialized generics
 	Methods      []*Object // Type [*Function]
@@ -56,6 +56,8 @@ func (ei *EnumItem) EnumParent() *Enum { return ei.Enum }
 
 // Can be used as a value. An EnumRef can be indexed by the enum's methods,
 // the item's param names, and the builtin `name` and `value` fields.
+// TODO: Make this non-constant by only knowing the parent enum, not the
+// specific item.
 type EnumRef struct {
 	*EnumItem
 	// Uncomment for constant analysis
@@ -77,6 +79,7 @@ func (er *EnumRef) Underlying() Type {
 	return newEnumFunction(er.EnumItem)
 }
 
+// Deprecated: [EnumConst] will be used instead
 type EnumFunction struct {
 	*Lambda
 	*EnumItem
@@ -124,8 +127,8 @@ func (c *Checker) checkEnumDecl(o *Object, node *ast.EnumDeclaration) {
 		)
 
 		// Value - must be unique for each item
-		c.checkEnumValue(
-			o, e, ei, entry.Range, entry.Value,
+		c.checkOrInferEnumValue(
+			ei, entry.Range, entry.Value,
 			valueMap, &firstValue, &ranges.Range{}, fctx,
 		)
 
@@ -173,8 +176,9 @@ func firstParamDecl(params []*ast.TypePair, name string) ast.Identifier {
 	panic("param " + name + " not found")
 }
 
-func (c *Checker) checkEnumValue(o *Object, e *Enum, ei *EnumItem,
-	r ranges.Range, expr ast.Expression,
+// TODO: Rewrite this
+func (c *Checker) checkOrInferEnumValue(ei *EnumItem,
+	itemRange ranges.Range, expr ast.Expression,
 	valueMap map[any]*EnumItem, firstValue *any, firstRange *ranges.Range,
 	fctx *Context,
 ) {
@@ -182,31 +186,31 @@ func (c *Checker) checkEnumValue(o *Object, e *Enum, ei *EnumItem,
 	// the first has an explicit value
 	if expr == nil {
 		// No explicit val
-		c.checkImplicitEnumValue(e, firstValue, r, o, ei, valueMap)
+		c.inferEnumValue(firstValue, valueMap, ei, itemRange)
 		return
 	}
 
 	// Parse the expression as a constant and validate uniqueness
-	ce := c.checkEnumValueExpr(expr, fctx)
-	valType, cv := ce.Type, ce.Value.ConstValue()
+	ce := c.checkEnumValueExpr(expr, fctx).ConstExpr()
+	cv := ce.Value.ConstValue()
 	if *firstValue == nil {
 		// First value. Determine type for the entire enum
-		e.ItemType = valType
+		ei.Enum.ItemType = ce.Type
 		*firstValue = cv
 		// For strings, determine casing mode and store that in firstValue
-		if valType == StringType {
+		if ce.Type == StringType {
 			*firstValue = getCasingMode(ei.Name, cv.(string))
 		}
-	} else if e.ItemType != valType { // Type mismatch
+	} else if ei.Enum.ItemType != ce.Type { // Type mismatch
 		// TODO: Untyped Int then Float is allowed
-		err := typeMismatch(e.ItemType, valType, expr.GetRange())
+		err := typeMismatch(ei.Enum.ItemType, ce.Type, expr.GetRange())
 		if !firstRange.IsZero() {
 			err.AddHighlight(
-				"First value of the enum has type "+klarerrs.Quote(e.ItemType.String()),
+				"First value of the enum has type "+klarerrs.Quote(ei.Enum.ItemType.String()),
 				*firstRange,
 			)
 		}
-		c.fileError(err, o.File)
+		c.fileError(err, ei.File)
 	}
 
 	// Check uniqueness of value
@@ -217,22 +221,38 @@ func (c *Checker) checkEnumValue(o *Object, e *Enum, ei *EnumItem,
 		err.SetParam("otherKey", otherItem.Name)
 		err.AddDetail(
 			"Item "+klarerrs.Quote(otherItem.Name)+" was declared here",
-			c.Module.ResolveFile(o.File), expr.GetRange(),
+			c.Module.ResolveFile(ei.File), expr.GetRange(),
 		)
-		c.fileError(err, o.File)
+		c.fileError(err, ei.File)
 	} else {
 		valueMap[cv] = ei
 	}
 }
 
-func (c *Checker) checkImplicitEnumValue(e *Enum, firstValue *any, r ranges.Range, o *Object, ei *EnumItem, valueMap map[any]*EnumItem) {
+func (c *Checker) checkEnumValueExpr(expr ast.Expression, fctx *Context) *Expr {
+	e := c.checkExpr(expr, NewExpr(fctx, constExpr))
+	switch e.Kind() {
+	case StringType, IntType, FloatType:
+	default:
+		err := klarerrs.Node(klarerrs.ErrInvalidEnumValue, expr)
+		err.Label = "This value has type " + quoteAka(e.Type)
+		c.fileError(err, fctx.File)
+		// Set the enum item's value to a valid type in case some other place expects one
+		e.Type = &ConstExpr{InvalidType, UnknownConst{}}
+	}
+	return e
+}
+
+func (c *Checker) inferEnumValue(
+	firstValue *any, valueMap map[any]*EnumItem, ei *EnumItem, itemRange ranges.Range,
+) {
 	var val ConstValue
-	i := len(e.Items) - 1
-	switch e.ItemType {
+	i := len(ei.Enum.Items) - 1
+	switch ei.Enum.ItemType {
 	case nil:
 		// First value
 		// Enum values are Int by default
-		e.ItemType = IntType
+		ei.Enum.ItemType = IntType
 		*firstValue = int64(0)
 		val = IntConst(0)
 
@@ -248,7 +268,9 @@ func (c *Checker) checkImplicitEnumValue(e *Enum, firstValue *any, r ranges.Rang
 		switch (*firstValue).(casingMode) {
 		case noCasePattern:
 			// Can't infer this value
-			c.fileError(klarerrs.Range(klarerrs.ErrCantInferStringEnum, r), o.File)
+			err := klarerrs.Range(klarerrs.ErrCantInferStringEnum, itemRange)
+			err.Hint("The value can be inferred if the first enum item's value is its name, which can be in camelCase, lowercase, UPPERCASE, or PascalCase.")
+			c.fileError(err, ei.File)
 			str = ei.Name
 		case nameCase:
 			str = ei.Name
@@ -257,6 +279,7 @@ func (c *Checker) checkImplicitEnumValue(e *Enum, firstValue *any, r ranges.Rang
 		case upperCasing:
 			str = strings.ToUpper(ei.Name)
 		case pascalCasing:
+			// TODO: Validate this conversion
 			str = toPascalCase(ei.Name)
 		default:
 			panic(fmt.Sprintf(
@@ -264,8 +287,10 @@ func (c *Checker) checkImplicitEnumValue(e *Enum, firstValue *any, r ranges.Rang
 			))
 		}
 		val = StringConst{Value: str}
+	case InvalidType:
+	// TODO: Allow invalid enum values to not be unique
 	default:
-		panic("invalid enum item type: " + e.ItemType.String())
+		panic("invalid enum item type: " + ei.Enum.ItemType.String())
 	}
 	ei.Value = val
 	valueMap[val.ConstValue()] = ei
@@ -293,6 +318,7 @@ func getCasingMode(name, value string) casingMode {
 	case strings.ToLower(name):
 		return lowerCasing
 	default:
+		// TODO: Validate this check
 		// Check for PascalCase
 		var firstLower int
 		for i, r := range value {
@@ -310,11 +336,6 @@ func getCasingMode(name, value string) casingMode {
 }
 
 func toPascalCase(s string) string { return strings.ToUpper(s[:1]) + s[1:] }
-
-func (c *Checker) checkEnumValueExpr(expr ast.Expression, ctx *Context) *ConstExpr {
-	e := c.checkExpr(expr, NewExpr(ctx, constExpr))
-	return e.ConstExpr()
-}
 
 func (item *EnumItem) ParamByName(label string) Type {
 	if item.ParamMap == nil {
