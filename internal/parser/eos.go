@@ -189,7 +189,8 @@ func ContinuesStatement(t lexer.TokenType) bool {
 		// Distributive
 		lexer.And, lexer.Or,
 		// Punctuation
-		lexer.Dot, lexer.RightBracket, lexer.RightParenthesis, lexer.Comma,
+		lexer.Dot, lexer.RightBracket, lexer.RightParenthesis, lexer.LeftCurlyBrace,
+		lexer.Comma,
 		// Operators
 		lexer.Stroke, lexer.Pipeline, lexer.Arrow, lexer.StrokeDot, lexer.Ellipsis,
 		lexer.DotDotLessThan, lexer.NotNot,
