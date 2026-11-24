@@ -94,7 +94,7 @@ func (r *Reporter) LoadLazyFile(
 	load func() (shortPath string, tokens []lexer.Token),
 ) {
 	if r.lazyFiles == nil {
-		r.lazyFiles = map[string](func() (string, []lexer.Token)){}
+		r.lazyFiles = map[string]func() (string, []lexer.Token){}
 	}
 	r.lazyFiles[path] = load
 }
