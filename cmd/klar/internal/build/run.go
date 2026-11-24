@@ -148,11 +148,14 @@ func Build(r *argparse.Parser) {
 		}
 	default:
 		// Successes, errors, and/or warnings
-		ShowResult(res, c)
+		if ok := ShowResult(res, c); !ok {
+			cli.Exit(1)
+		}
 	}
 }
 
-func ShowResult(res *build.Result, c *build.Compiler) {
+// TODO: Change uses of the word 'build' when running lint, format, test, or run.
+func ShowResult(res *build.Result, c *build.Compiler) (ok bool) {
 	var (
 		warnCount, errCount = len(res.Warnings), len(res.Errors)
 		icon, format        string
@@ -205,8 +208,9 @@ func ShowResult(res *build.Result, c *build.Compiler) {
 		))
 	}
 	if errCount > 0 {
-		cli.Exit(1)
+		return false
 	}
+	return true
 }
 
 // ParseFlags parses flags from r into o.

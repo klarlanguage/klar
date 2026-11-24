@@ -89,6 +89,7 @@ var Commands = map[string]*command.Command{
 		ShortDescription: "Check your code for correctness",
 		Run:              lint.Run,
 		LongDescription:  lint.LongDescription,
+		Flags:            lint.Flags,
 	},
 	"test": {
 		ShortDescription: "Run tests for a Klar project",
@@ -109,8 +110,11 @@ var Commands = map[string]*command.Command{
 var Aliases = map[string]string{
 	"b":     "build",
 	"r":     "run",
+	"t":     "test",
+	"l":     "lint",
 	"up":    "upgrade",
 	"check": "lint",
+	"fmt":   "format",
 }
 
 type s = []string
