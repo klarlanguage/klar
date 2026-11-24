@@ -119,7 +119,11 @@ func (c *Command) FlagString(indent int) string {
 			tw.WriteString(sep + argparse.FormatFlag(alias))
 		}
 		if flag.ParamName != "" {
-			tw.WriteString(ansi.Green(" <" + flag.ParamName + ">"))
+			var listDots string
+			if flag.Type == argparse.TypeList {
+				listDots = ansi.Dim(",...") + ansi.Partial(ansi.CodeGreen)
+			}
+			tw.WriteString(ansi.Green(" <" + flag.ParamName + listDots + ">"))
 		}
 		fmt.Fprintf(tw, "%s\t%s %s\n", ansi.Reset(), flag.Description, getDefault(flag))
 	}

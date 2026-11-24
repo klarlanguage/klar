@@ -292,7 +292,7 @@ func (p *Parser) parseList(name string, def *FlagDef, next string) (items any, e
 			continue
 		}
 		switch def.ItemType {
-		case TypeString:
+		case 0, TypeString:
 			items, err = addItem(item, items, func(_, s string) (string, error) {
 				return s, nil
 			})
