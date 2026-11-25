@@ -26,7 +26,7 @@ See [../../samples/basic/all.klon](https://github.com/klarlanguage/klar/tree/mai
 - A query language for making modifications to Klon ASTs
     ```go
     _ = klon.MustQuery(manifest, `dependencies += [@npm '@proicons/react' v4.x]`)
-    klon.WriteASTTo(manifest, "glas.pack")
+    klon.WriteASTTo(manifest, w)
     ```
 - Specialised `time.Time` serialization
 - A builtin `@import` class to import fields and variables from other Klon files
@@ -54,6 +54,11 @@ See [../../samples/basic/all.klon](https://github.com/klarlanguage/klar/tree/mai
 - Allow objects as class parameters
 - Functions/mixins to return objects based on parameters
 - Builtin string utilities (e.g. case conversions, slicing, replace)
-- An equivalent to Go's `encoding/json/jsontext.Value` (`json.RawMessage` in v1) so objects can be decoded later. As an implementation note, an indented object would be converted to inline (using braces).
+- An equivalent to Go's `encoding/json.jsontext.Value` (`json.RawMessage` in v1) so objects can be decoded later. As an implementation note, an indented object would be converted to inline (using braces).
+- Allow an inline object or list to be used in a string sequence
+    ```klon
+    rules:
+        - fileNaming: true { basedOnTypes: false }
+    ```
 
 ## Architecture

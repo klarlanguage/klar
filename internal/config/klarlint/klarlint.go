@@ -35,8 +35,8 @@ type Config struct {
 }
 
 type RuleSetting struct {
-	Level   DiagnosticLevel
-	Options map[string]any
+	Level   DiagnosticLevel `options:"DiagnosticLevel"`
+	Options map[string]any  // TODO: Use some equivalent to jsontext.Value
 }
 
 type DiagnosticLevel int
