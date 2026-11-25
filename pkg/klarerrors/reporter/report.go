@@ -2,6 +2,7 @@ package reporter
 
 import (
 	"bytes"
+	"cmp"
 	"fmt"
 	"strings"
 
@@ -106,11 +107,11 @@ func (r *Reporter) printMessage(e Error, hlc string) {
 	var b strings.Builder
 	// Error title and message
 	if r.UseColor {
-		b.WriteString(ansi.Color(hlc, e.Title()))
+		b.WriteString(ansi.Color(hlc, cmp.Or(e.Title(), "Error")))
 		b.WriteString(ansi.BoldDim(": "))
 		b.WriteString(ansi.Bold(e.Message()))
 	} else {
-		fmt.Fprintf(&b, "%s: %s", e.Title(), e.Message())
+		fmt.Fprintf(&b, "%s: %s", cmp.Or(e.Title(), "Error"), e.Message())
 	}
 	// Error code
 	if e.ErrorCode() != "" {

@@ -16,7 +16,7 @@ import (
 
 // Error is an interface that represents an error to report.
 type Error interface {
-	Title() string       // The title of the error, such as "Error".
+	Title() string       // The title of the error, such as "Error" (the default).
 	Message() string     // The error message.
 	Description() string // Extended message
 	ErrorCode() string   // The error code, displayed after the message.
