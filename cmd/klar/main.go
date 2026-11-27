@@ -146,7 +146,7 @@ func handleExit(crashLogFile *os.File) {
 }
 
 const panicMessage = `<** r!>Oh no!</r!> The Klar CLI has crashed.</>
-This isn't your fault; plase report an issue at <c!>%s/new</c!>.
+This isn't your fault; plase report an issue at <m!>%s/new</m!>.
 
 <**>In your report, please include:</**>
 
