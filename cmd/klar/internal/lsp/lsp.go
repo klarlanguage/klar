@@ -28,6 +28,6 @@ func Run(*argparse.Parser) {
 
 const LongDescription = "Note: " + description
 
-const description = `This command is intended for programmatic use by editors. Humans won't need to manually run this. For information about setting up your IDE for Klar development, see [docs url].
+const description = `This command is intended for programmatic use by editors. Humans won't need to manually run this. For information about setting up your IDE for Klar development, see https://klarlanguage.github.io/docs/klarls.
 
 The Klar Language Server (KlarLS) is an implementation of the Language Server Protocol (LSP) for the Klar programming language. Editors that support the LSP protocol can start KlarLS by running 'klar lsp' with the Klar CLI.`
