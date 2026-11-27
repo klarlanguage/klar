@@ -7,6 +7,7 @@ import (
 	"maps"
 	"os"
 	"slices"
+	"strings"
 	"unicode"
 
 	"github.com/klarlanguage/klar/internal/cli/ansi"
@@ -14,6 +15,27 @@ import (
 )
 
 var defaultForm = NewForm("", Single)
+
+func Text(msg, desc, def string) string {
+	return defaultForm.Text(msg, desc, def)
+}
+
+func (f *Form) Text(msg, desc, def string) string {
+	f.inputTitle(msg, "")
+	if desc != "" {
+		ansi.ColorPrint(ansi.CodeDim, " ", desc)
+	}
+	if def != "" {
+		fmt.Print(" ", ansi.Dim("(default: "+def+")"))
+	}
+	fmt.Print(": ")
+	res, err := bufio.NewReader(os.Stdin).ReadString('\n')
+	res = strings.TrimSpace(res)
+	if err != nil || res == "" {
+		return def
+	}
+	return res
+}
 
 func Confirm(msg string, defaultRes bool) bool {
 	return defaultForm.Confirm(msg, defaultRes)
@@ -29,7 +51,7 @@ func (f *Form) Confirm(msg string, defaultRes bool) bool {
 	}
 
 	// Prompt
-	f.inputTitle(msg)
+	f.inputTitle(msg, " ")
 	fmt.Print(defaultStr, ": ")
 	defer fmt.Println() // Final newline
 
@@ -59,7 +81,7 @@ func ChooseLetter(msg string, opts map[byte]string, def byte) byte {
 }
 
 func (f *Form) ChooseLetter(msg string, opts map[byte]string, def byte) byte {
-	f.inputTitle(msg)
+	f.inputTitle(msg, " ")
 	ansi.ColorPrint(ansi.CodeDim, "[")
 	for i, char := range slices.Sorted(maps.Keys(opts)) {
 		if i > 0 {

@@ -61,7 +61,7 @@ func (f *Form) dividerNewline() {
 	}
 }
 
-func (f *Form) inputTitle(text string) {
+func (f *Form) inputTitle(text, terminator string) {
 	if text == "" {
 		return
 	}
@@ -69,11 +69,23 @@ func (f *Form) inputTitle(text string) {
 	switch f.Theme {
 	case ConnectedDiamonds:
 		f.dividerNewline()
-		fmt.Printf("%s %s ", ansi.Color(f.Accent, string(icons.Rhombus)), text)
+		fmt.Printf("%s %s%s", ansi.Color(f.Accent, string(icons.Rhombus)), text, terminator)
 	case Classic:
-		fmt.Printf("%s %s ", ansi.Color(f.Accent, "?"), text)
+		fmt.Printf("%s %s%s", ansi.Color(f.Accent, "?"), text, terminator)
 	case Single:
-		ansi.ColorPrint(ansi.CodeBold, text, " ")
+		ansi.ColorPrint(ansi.CodeBold, text, terminator)
+	}
+}
+
+func (f *Form) Log(text string) {
+	switch f.Theme {
+	case ConnectedDiamonds:
+		f.dividerNewline()
+		fmt.Printf("%s %s\n", ansi.Yellow(string(icons.Rhombus)), text)
+	case Classic:
+		fmt.Printf("%s %s\n", ansi.Yellow("!"), text)
+	case Single:
+		ansi.ColorPrintln(ansi.CodeBold, text)
 	}
 }
 

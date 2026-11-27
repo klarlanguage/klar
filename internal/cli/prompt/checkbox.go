@@ -19,8 +19,7 @@ func Checkboxes(title, desc string, opts map[string]bool, def bool) {
 func (f *Form) Checkboxes(title, desc string, opts map[string]bool, def bool) {
 	// Prompt
 	if title != "" {
-		f.inputTitle(title)
-		fmt.Println()
+		f.inputTitle(title, "\n")
 	}
 	if desc != "" {
 		f.divider()
