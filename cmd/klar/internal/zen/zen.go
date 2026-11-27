@@ -14,6 +14,7 @@ import (
 )
 
 // TODO: Write
+// Possibly store it in a file and embed it, so it can be shared with the Klar docs
 const Zen = ``
 
 var width = 80
