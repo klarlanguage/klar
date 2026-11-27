@@ -60,7 +60,7 @@ func main() {
 		ShowHelp(os.Stdout, true)
 	case "-v", "--version", "version":
 		fmt.Printf("Klar %s (%s)\n", cli.KlarVersion, cli.KlarCommit)
-	case "test", "generate":
+	case "generate":
 		// Unimplemented command
 		cli.Failure(ansi.ColorSprintf(
 			ansi.CodeBold,

@@ -10,6 +10,7 @@ import (
 	klarnew "github.com/klarlanguage/klar/cmd/klar/internal/new"
 	"github.com/klarlanguage/klar/cmd/klar/internal/repl"
 	"github.com/klarlanguage/klar/cmd/klar/internal/run"
+	"github.com/klarlanguage/klar/cmd/klar/internal/test"
 	"github.com/klarlanguage/klar/cmd/klar/internal/upgrade"
 	"github.com/klarlanguage/klar/cmd/klar/internal/zen"
 	"github.com/klarlanguage/klar/internal/command"
@@ -93,6 +94,9 @@ var Commands = map[string]*command.Command{
 	},
 	"test": {
 		ShortDescription: "Run tests for a Klar project",
+		Run:              test.Run,
+		LongDescription:  test.LongDescription,
+		Flags:            test.Flags,
 	},
 	"upgrade": {
 		ShortDescription: "Upgrade Klar to the latest version",
