@@ -7,6 +7,7 @@ import (
 
 	"github.com/klarlanguage/klar/internal/cli/ansi"
 	"github.com/klarlanguage/klar/internal/module"
+	"golang.org/x/term"
 )
 
 func TitlePrefix(color, title string) string {
@@ -17,6 +18,9 @@ var errorPrefix = TitlePrefix(ansi.CodeBoldBrightRed, "Error")
 
 // CustomError prints an error to [os.Stderr] with a custom title
 func CustomError(titleColor, title, msg string, detail ...any) {
+	if !term.IsTerminal(int(os.Stderr.Fd())) {
+		defer ansi.SetColorDisabled()()
+	}
 	t := strings.TrimSuffix(TitlePrefix(titleColor, title), " ")
 	v := []any{t}
 	if msg != "" {

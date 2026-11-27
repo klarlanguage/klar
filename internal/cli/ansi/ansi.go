@@ -6,6 +6,8 @@ import (
 	"os"
 	"regexp"
 	"strings"
+
+	"golang.org/x/term"
 )
 
 const (
@@ -136,6 +138,12 @@ func ColorPrintfln(color, format string, a ...any) {
 	fmt.Println(ColorSprintf(color, format, a...))
 }
 
+func SetColorDisabled() (reset func()) {
+	old := DisableColor
+	DisableColor = true
+	return func() { DisableColor = old }
+}
+
 func ColorPrintln(color string, v ...any) {
 	if DisableColor {
 		fmt.Println(v...)
@@ -157,6 +165,9 @@ func ColorPrint(color string, v ...any) {
 }
 
 func ColorFprintln(file io.Writer, color, format string, a ...any) {
+	if f, ok := file.(*os.File); ok && !term.IsTerminal(int(f.Fd())) {
+		defer SetColorDisabled()()
+	}
 	fmt.Fprintln(file, ColorSprintf(color, format, a...))
 }
 
