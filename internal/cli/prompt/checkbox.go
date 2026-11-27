@@ -11,18 +11,25 @@ import (
 	"golang.org/x/term"
 )
 
-// Bash implementation: https://askubuntu.com/a/1386907
 func Checkboxes(title, desc string, opts map[string]bool, def bool) {
+	defaultForm.Checkboxes(title, desc, opts, def)
+}
+
+// Bash implementation: https://askubuntu.com/a/1386907
+func (f *Form) Checkboxes(title, desc string, opts map[string]bool, def bool) {
 	// Prompt
 	if title != "" {
-		ansi.TagPrintfln("<y>◆</y> <**>%s</**>", title)
+		f.inputTitle(title)
+		fmt.Println()
 	}
 	if desc != "" {
+		f.divider()
 		fmt.Println(desc)
 	}
+	f.divider()
 	ansi.TagPrintfln(
-		"<d><**>Arrows ↑↓</**> Move up/down | <**>Space</**> Toggle | " +
-			"<**>A</**> Select/deselect all | <**>Enter</**> Done</d>",
+		"<d><**>Arrows ↑↓</**>: Move up/down | <**>Space</**>: Toggle | " +
+			"<**>A</**>: Select/deselect all | <**>Enter</**>: Done</d>",
 	)
 
 	prevState, err := term.MakeRaw(int(os.Stdin.Fd()))
@@ -53,6 +60,7 @@ func Checkboxes(title, desc string, opts map[string]bool, def bool) {
 				chevron = ansi.BrightCyan(string(currChar))
 				label = ansi.BrightCyan(label)
 			}
+			f.divider()
 			fmt.Printf("%s %s %s\r\n", chevron, checkbox, label)
 		}
 		buf := make([]byte, 3)

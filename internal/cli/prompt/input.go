@@ -13,7 +13,13 @@ import (
 	"golang.org/x/term"
 )
 
+var defaultForm = NewForm("", Single)
+
 func Confirm(msg string, defaultRes bool) bool {
+	return defaultForm.Confirm(msg, defaultRes)
+}
+
+func (f *Form) Confirm(msg string, defaultRes bool) bool {
 	// (y/n) display
 	var defaultStr string
 	if defaultRes {
@@ -22,8 +28,10 @@ func Confirm(msg string, defaultRes bool) bool {
 		defaultStr = ansi.ColorSprintf(ansi.CodeDim, "(y/%s)", ansi.BoldBrightRed("N"))
 	}
 
-	fmt.Printf("%s %s: ", msg, defaultStr) // Prompt
-	defer fmt.Println()                    // Final newline
+	// Prompt
+	f.inputTitle(msg)
+	fmt.Print(defaultStr, ": ")
+	defer fmt.Println() // Final newline
 
 	// The terminal has to be made raw so we can read a single character without
 	// the user pressing Enter
@@ -47,10 +55,15 @@ func Confirm(msg string, defaultRes bool) bool {
 }
 
 func ChooseLetter(msg string, opts map[byte]string, def byte) byte {
-	fmt.Print(msg, ansi.Dim(" ["))
+	return defaultForm.ChooseLetter(msg, opts, def)
+}
+
+func (f *Form) ChooseLetter(msg string, opts map[byte]string, def byte) byte {
+	f.inputTitle(msg)
+	ansi.ColorPrint(ansi.CodeDim, "[")
 	for i, char := range slices.Sorted(maps.Keys(opts)) {
 		if i > 0 {
-			fmt.Print(ansi.Dim(" | "))
+			ansi.ColorPrint(ansi.CodeDim, " | ")
 		}
 		label := opts[char]
 		var bold string
@@ -60,7 +73,7 @@ func ChooseLetter(msg string, opts map[byte]string, def byte) byte {
 		}
 		ansi.TagPrintf("%s<y>(%c)</y> %s</>", bold, char, label)
 	}
-	fmt.Print(ansi.Dim("] "))
+	ansi.ColorPrint(ansi.CodeDim, "] ")
 	for {
 		// No raw mode
 		buf, err := bufio.NewReader(os.Stdin).ReadBytes('\n')
@@ -75,6 +88,7 @@ func ChooseLetter(msg string, opts map[byte]string, def byte) byte {
 		if _, ok := opts[got]; ok {
 			return got
 		}
+		f.divider()
 		ansi.ColorPrint(ansi.CodeRed, "Please choose a valid option: ")
 	}
 }

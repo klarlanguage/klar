@@ -14,11 +14,12 @@ const (
 	RoundTopRight    = '╮'
 	RoundBottomLeft  = '╰'
 	RoundBottomRight = '╯'
-	ThickX           = '✖'
-	ThinX            = '✕'
-	ThinXLarge       = '✗'
-	Check            = '✓'
-	Warning          = '⚠'
-)
 
-// ›
+	ThickX            = '✖'
+	ThinX             = '✕'
+	ThinXLarge        = '✗'
+	Check             = '✓'
+	Warning           = '⚠'
+	Rhombus           = '◆'
+	SmallChevronRight = '›'
+)
