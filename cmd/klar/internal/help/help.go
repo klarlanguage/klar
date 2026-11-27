@@ -1,9 +1,11 @@
-// TODO: incomplete
 package help
 
 import (
 	"fmt"
+	"maps"
 	"os"
+	"slices"
+	"strings"
 
 	"github.com/klarlanguage/klar/internal/cli"
 	"github.com/klarlanguage/klar/internal/cli/ansi"
@@ -14,30 +16,50 @@ import (
 
 // Existing CLI commands already handled in main.go
 func Run(c *argparse.Parser) {
-	if len(c.Args) < 1 {
-		cli.Failure("Expected a command or topic name when '-d' flag is used")
-	}
-	name := c.ArgByName("command")
-	topic, ok := Topics[name]
+	name := c.ArgByName("command-or-topic")
 	switch {
-	case ok:
-	case c.Flag("d").Bool():
+	case c.Flag("topics").Bool():
+		ListTopics()
+	case c.Flag("error").Bool():
+		ExplainError(name)
+	case c.Flag("docs").Bool():
+		if name == "" {
+			cli.Failure("Please provide a command or topic name")
+		}
 		// Show documentation online
 		cli.Eprintf(
 			"Searching documentation for %s on %s\n",
 			ansi.Cyan(name), ansi.Magenta("site.url"),
 		)
 	default:
+		if name == "" {
+			cli.Failure("Please provide a command or topic name")
+		}
+		if t := findTopic(name); t != nil {
+			DisplayTopic(Topics[name])
+			break
+		}
 		cli.Error("Can't find a CLI command or topic named " + ansi.Cyan(name))
 		cli.HintIndent(
 			"To search online documentation, use the " + ansi.Cyan("-d") + " flag.",
 		)
 		cli.Exit(1)
 	}
-	DisplayTopic(topic)
 }
 
-func DisplayTopic(t Topic) {
+func findTopic(query string) *Topic {
+	if t, ok := Topics[strings.ToLower(query)]; ok {
+		return t
+	}
+	for _, t := range Topics {
+		if strings.EqualFold(t.Title, query) {
+			return t
+		}
+	}
+	return nil
+}
+
+func DisplayTopic(t *Topic) {
 	termWidth, _, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {
 		termWidth = 0
@@ -55,8 +77,22 @@ func DisplayTopic(t Topic) {
 	}
 }
 
-var Flags = argparse.NewParser("[command]").
-	BoolFlag("docs", "Show online documentation for the command", false, "d")
+func ListTopics() {
+	ansi.ColorPrintln(ansi.CodeBold, "Help topics:")
+	for _, id := range slices.Sorted(maps.Keys(Topics)) {
+		t := Topics[id]
+		ansi.TagPrintfln(
+			"\n%s <d>(%s)</d>\n    %s",
+			ansi.BoldBrightBlue(ansi.Hyperlink(t.Title, t.URL)), id,
+			t.Description,
+		)
+	}
+}
+
+var Flags = argparse.NewParser("[command-or-topic]").
+	BoolFlag("docs", "Show online documentation for the command or topic", false, "d", "web").
+	BoolFlag("topics", "List the available topics", false).
+	BoolFlag("error", "Explain a compiler error", false, "e")
 
 const LongDescription = `Shows details about a Klar CLI command or topic, including its usage and available options. This includes the 'klar help' command itself, which displays this message.
 
