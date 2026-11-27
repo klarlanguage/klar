@@ -50,13 +50,13 @@ func ShowHelp(w io.Writer, full bool) {
 	hb.Command("format", "Format source code")
 	hb.Command("lint", "Check your code for correctness")
 	hb.Command("test", "Run tests for a Klar project")
-	if full {
-		hb.Command("lsp", "Start the Klar Language Server (for IDEs only)")
-	}
 
 	hb.Split(ansi.Cyan)
 	hb.Command("clean", "Clean build cache")
 	hb.Command("upgrade", "Upgrade Klar to the latest version")
+	if full {
+		hb.Command("lsp", "Start the Klar Language Server (for IDEs only)")
+	}
 	hb.Command("zen", "Show the Zen of Klar") // TODO: `klar lore` instead?
 	hb.Command("help", "Get help for a command or show this message")
 	hb.Flush()
