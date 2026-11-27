@@ -16,6 +16,7 @@ var RandomDescriptions = []string{
 	ansi.Green("⏩ The progressive programming language"),
 	ansi.Yellow("Not another C-based programming language"),
 	ansi.Cyan("🐨 A koala-approved programming language!"),
+	ansi.Bit8(86, "🐨 For the koalas since 2025"),
 }
 
 func ShowHelp(w io.Writer, full bool) {
