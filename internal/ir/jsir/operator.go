@@ -51,6 +51,7 @@ const (
 
 	// Assignment
 
+	OpAssign            // =
 	OpPlusEqual         // +=
 	OpMinusEqual        // -=
 	OpTimesEqual        // *=

@@ -37,33 +37,34 @@ func _() {
 	_ = x[OpLogicalOr-27]
 	_ = x[OpNullCoalesce-28]
 	_ = x[OpLogicalNot-29]
-	_ = x[OpPlusEqual-30]
-	_ = x[OpMinusEqual-31]
-	_ = x[OpTimesEqual-32]
-	_ = x[OpDivideEqual-33]
-	_ = x[OpRemainderEqual-34]
-	_ = x[OpExponentEqual-35]
-	_ = x[OpShiftLeftEqual-36]
-	_ = x[OpShiftRightEqual-37]
-	_ = x[OpUShiftRightEqual-38]
-	_ = x[OpBitwiseAndEqual-39]
-	_ = x[OpBitwiseOrEqual-40]
-	_ = x[OpBitwiseXOrEqual-41]
-	_ = x[OpLogicalAndEqual-42]
-	_ = x[OpLogicalOrEqual-43]
-	_ = x[OpNullCoalesceEqual-44]
-	_ = x[OpAwait-45]
-	_ = x[OpDelete-46]
-	_ = x[OpVoid-47]
-	_ = x[OpTypeof-48]
-	_ = x[OpNew-49]
-	_ = x[OpYield-50]
-	_ = x[OpYieldStar-51]
+	_ = x[OpAssign-30]
+	_ = x[OpPlusEqual-31]
+	_ = x[OpMinusEqual-32]
+	_ = x[OpTimesEqual-33]
+	_ = x[OpDivideEqual-34]
+	_ = x[OpRemainderEqual-35]
+	_ = x[OpExponentEqual-36]
+	_ = x[OpShiftLeftEqual-37]
+	_ = x[OpShiftRightEqual-38]
+	_ = x[OpUShiftRightEqual-39]
+	_ = x[OpBitwiseAndEqual-40]
+	_ = x[OpBitwiseOrEqual-41]
+	_ = x[OpBitwiseXOrEqual-42]
+	_ = x[OpLogicalAndEqual-43]
+	_ = x[OpLogicalOrEqual-44]
+	_ = x[OpNullCoalesceEqual-45]
+	_ = x[OpAwait-46]
+	_ = x[OpDelete-47]
+	_ = x[OpVoid-48]
+	_ = x[OpTypeof-49]
+	_ = x[OpNew-50]
+	_ = x[OpYield-51]
+	_ = x[OpYieldStar-52]
 }
 
-const _Operator_name = "==!====!==><>=<=ininstanceof+-*/%++--**&|^~<<>>>>>&&||??!+=-=*=/=%=**=<<=>>=>>>=&=|=^=&&=||=??=awaitdeletevoidtypeofnewyieldyield*"
+const _Operator_name = "==!====!==><>=<=ininstanceof+-*/%++--**&|^~<<>>>>>&&||??!=+=-=*=/=%=**=<<=>>=>>>=&=|=^=&&=||=??=awaitdeletevoidtypeofnewyieldyield*"
 
-var _Operator_index = [...]uint8{0, 2, 4, 7, 10, 11, 12, 14, 16, 18, 28, 29, 30, 31, 32, 33, 35, 37, 39, 40, 41, 42, 43, 45, 47, 50, 52, 54, 56, 57, 59, 61, 63, 65, 67, 70, 73, 76, 80, 82, 84, 86, 89, 92, 95, 100, 106, 110, 116, 119, 124, 130}
+var _Operator_index = [...]uint8{0, 2, 4, 7, 10, 11, 12, 14, 16, 18, 28, 29, 30, 31, 32, 33, 35, 37, 39, 40, 41, 42, 43, 45, 47, 50, 52, 54, 56, 57, 58, 60, 62, 64, 66, 68, 71, 74, 77, 81, 83, 85, 87, 90, 93, 96, 101, 107, 111, 117, 120, 125, 131}
 
 func (i Operator) String() string {
 	idx := int(i) - 1

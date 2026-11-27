@@ -2,38 +2,55 @@ package codegen
 
 import (
 	"fmt"
-	"maps"
-	"slices"
 
 	"github.com/klarlanguage/klar/internal/analysis"
 	"github.com/klarlanguage/klar/internal/ast"
 	"github.com/klarlanguage/klar/internal/ir/jsir"
 )
 
-func (g *Generator) convertObject(o *analysis.Object) jsir.Statement {
+func (g *Generator) convertObject(o *analysis.Object, b *block) (res jsir.Statement) {
+	defer func() {
+		if res != nil {
+			if o.Public && o.Context.File.TopLevel() {
+				res = &jsir.ExportModifierStatement{Declaration: res}
+			}
+			b.stmts = append(b.stmts, res)
+		}
+	}()
 	switch stmt := o.Node().(type) {
 	case *ast.FunctionDeclaration:
-		return g.convertFuncDecl(o)
+		g.convertFuncDecl(o, b)
+		return nil
 	case *ast.FuncAliasDeclaration:
 		return g.convertFuncAlias(o, stmt)
 	case *ast.VariableDeclaration:
-		return g.convertVarDecl(o, stmt)
+		return g.convertVarDecl(o, stmt, b)
 	case ast.TypeDeclaration:
-		return g.convertTypeDecl(o, stmt)
+		return g.convertTypeDecl(o, stmt, b)
 	default:
 		panic(fmt.Sprintf("invalid analysis.Object statement: %T", stmt))
 	}
 }
 
 func (g *Generator) convertTypeDecl(
-	o *analysis.Object, decl ast.TypeDeclaration,
+	o *analysis.Object, decl ast.TypeDeclaration, b *block,
 ) jsir.Statement {
 	typ := o.TypeName().Type
 	switch decl := decl.(type) {
 	case *ast.StructDeclaration:
-		return g.convertStruct(o, typ.(*analysis.Struct))
+		str := typ.(*analysis.Struct)
+		cls := g.convertStruct(o, str)
+		if len(str.Methods) > 0 {
+			g.addMethods(cls, o)
+		}
+		return cls
 	case *ast.EnumDeclaration:
-		return g.convertEnum(o, typ.(*analysis.Enum))
+		enum := typ.(*analysis.Enum)
+		class := g.convertEnum(o, enum, b)
+		if len(enum.Methods) > 0 {
+			g.addMethods(class, o)
+		}
+		return class
 	case *ast.InterfaceDeclaration:
 		return nil // TODO: Return one for TypeScript
 	case *ast.TagDeclaration:
@@ -49,7 +66,7 @@ func (g *Generator) convertTypeDecl(
 }
 
 func (g *Generator) convertVarDecl(
-	o *analysis.Object, decl *ast.VariableDeclaration,
+	o *analysis.Object, decl *ast.VariableDeclaration, b *block,
 ) jsir.Statement {
 	// Use 'let' for all declarations unless they are public, top-level constants
 	if len(decl.Variables) == 1 {
@@ -58,7 +75,7 @@ func (g *Generator) convertVarDecl(
 		if _, ok := decl.Variables[0].(*ast.Discard); ok {
 			return &jsir.ExpressionStatement{&jsir.UnaryExpression{
 				Operator: jsir.OpVoid,
-				Operand:  g.convertExpression(decl.Values[0]),
+				Operand:  g.convertExpression(decl.Values[0], b),
 			}}
 		}
 		return &jsir.BindingDeclaration{
@@ -67,7 +84,7 @@ func (g *Generator) convertVarDecl(
 			Variable: g.convertDestructure(
 				decl.Variables[0].(ast.Destructurable), !o.Public,
 			),
-			Value: g.convertExpression(decl.Values[0]),
+			Value: g.convertExpression(decl.Values[0], b),
 		}
 	}
 
@@ -77,7 +94,7 @@ func (g *Generator) convertVarDecl(
 	}
 	var singleRHS jsir.Expression
 	if decl.IsSingleRHS() {
-		singleRHS = g.convertExpression(decl.Values[0])
+		singleRHS = g.convertExpression(decl.Values[0], b)
 	}
 	for i, name := range decl.Variables {
 		// Don't declare discards. Remember that '_' is a valid identifier in JS.
@@ -88,7 +105,7 @@ func (g *Generator) convertVarDecl(
 		if singleRHS != nil {
 			val = singleRHS
 		} else {
-			val = g.convertExpression(decl.Values[i])
+			val = g.convertExpression(decl.Values[i], b)
 		}
 		jsDecl.Bindings = append(jsDecl.Bindings, &jsir.Binding{
 			Variable: g.convertDestructure(name.(ast.Destructurable), !o.Public),
@@ -99,12 +116,13 @@ func (g *Generator) convertVarDecl(
 		// All variables declared are discards, this just becomes a 'void' expression
 		return &jsir.ExpressionStatement{&jsir.UnaryExpression{
 			Operator: jsir.OpVoid,
-			Operand:  g.convertExpression(decl.Values[0]),
+			Operand:  g.convertExpression(decl.Values[0], b),
 		}}
 	}
 	return jsDecl
 }
 
+// TODO
 func (g *Generator) convertFuncAlias(
 	o *analysis.Object, decl *ast.FuncAliasDeclaration,
 ) *jsir.BindingDeclaration {
@@ -112,50 +130,6 @@ func (g *Generator) convertFuncAlias(
 		Kind:     jsir.ConstBinding,
 		Variable: escapedSymbol(o.Name, !o.Public),
 		Value:    &jsir.NullLiteral{},
-	}
-}
-
-func (g *Generator) convertFuncDecl(o *analysis.Object) jsir.Statement {
-	// Some overloads may have different names via the @name attribute.
-	// Group the overloads by name and convert those grouped ones to JavaScript.
-	var nameGroups map[string][]*analysis.Overload
-	fnType := o.Type.(*analysis.Function)
-	for _, ov := range fnType.Overloads {
-		if ov.Name != o.Name {
-			if nameGroups == nil {
-				nameGroups = make(map[string][]*analysis.Overload)
-			}
-			nameGroups[ov.Name] = append(nameGroups[ov.Name], ov)
-		}
-	}
-	var converted []jsir.Statement
-	if nameGroups == nil {
-		// No name changes
-		converted = make([]jsir.Statement, 0, len(fnType.Overloads)+1)
-		converted = g.appendOverloads(converted, fnType.Overloads)
-	} else {
-		// Some may still have the original name, so add that to nameGroups
-		for _, fnType := range fnType.Overloads {
-			if fnType.Name == o.Name {
-				nameGroups[fnType.Name] = append(nameGroups[fnType.Name], fnType)
-			}
-		}
-		converted = make([]jsir.Statement, 0, len(nameGroups)+len(fnType.Overloads))
-		// Sort the overloads by declaration order
-		sortOverloads := createOverloadSorter(nameGroups)
-		for _, name := range slices.SortedFunc(maps.Keys(nameGroups), sortOverloads) {
-			converted = g.appendOverloads(converted, nameGroups[name])
-		}
-	}
-	if len(converted) == 1 { // Optimization when there's only 1 overload
-		return converted[0]
-	}
-	return &jsir.StatementChain{converted}
-}
-
-func createOverloadSorter(nameGroups map[string][]*analysis.Overload) func(string, string) int {
-	return func(a, b string) int {
-		return int(nameGroups[a][0].Order) - int(nameGroups[b][0].Order)
 	}
 }
 
@@ -183,8 +157,8 @@ func (g *Generator) getGlobal(name string, ctx *analysis.Context) jsir.Expressio
 	if ctx.LookupRecursive(name) != nil {
 		return &jsir.IndexExpression{
 			Object:   &jsir.Symbol{"globalThis"},
-			Property: &jsir.Symbol{Name: name},
+			Property: &jsir.Symbol{name},
 		}
 	}
-	return &jsir.Symbol{Name: name}
+	return &jsir.Symbol{name}
 }

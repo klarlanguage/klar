@@ -10,7 +10,7 @@ import (
 	"github.com/klarlanguage/klar/internal/ir/jsir"
 )
 
-func (g *Generator) convertEnum(o *analysis.Object, enum *analysis.Enum) *jsir.ClassDeclaration {
+func (g *Generator) convertEnum(o *analysis.Object, enum *analysis.Enum, b *block) *jsir.ClassDeclaration {
 	stmt := o.Node().(*ast.EnumDeclaration)
 	cls := &jsir.ClassDeclaration{
 		Name:  o.Name,
@@ -23,7 +23,7 @@ func (g *Generator) convertEnum(o *analysis.Object, enum *analysis.Enum) *jsir.C
 		if len(ei.Params) == 0 {
 			binding := &jsir.Binding{Variable: &jsir.Symbol{ei.Name}}
 			if itemNode.Value != nil {
-				binding.Value = g.convertExpression(itemNode.Value)
+				binding.Value = g.convertExpression(itemNode.Value, b)
 			}
 			cls.Fields = append(cls.Fields, binding)
 			cls.Flags[binding] = jsir.Static

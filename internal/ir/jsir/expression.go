@@ -101,5 +101,5 @@ type CommaExpression struct {
 type ArrowFunction struct {
 	Async  bool
 	Params []Expression
-	Body   Expression
+	Body   any // [Expression] or [*Block]
 }

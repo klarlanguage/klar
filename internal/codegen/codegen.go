@@ -75,6 +75,7 @@ func (g *Generator) generateFile(f *File, fid analysis.FileID) {
 
 	// Anything not in this map is a top-level statement
 	declStmts := make(map[ast.Statement]struct{}, len(g.Context.SortedDecls()))
+	b := &block{stmts: f.IR.Statements, ctx: g.Context}
 	// Top-level declarations
 	// TODO: loop over g.Info.InitOrder when InitOrder is populated in
 	// the type checker
@@ -83,11 +84,7 @@ func (g *Generator) generateFile(f *File, fid analysis.FileID) {
 		if obj.File != fid || !g.canCodegen(obj) {
 			continue
 		}
-		jsStmt := g.convertObject(obj)
-		if obj.Public {
-			jsStmt = &jsir.ExportModifierStatement{Declaration: jsStmt}
-		}
-		f.IR.Statements = append(f.IR.Statements, jsStmt)
+		g.convertObject(obj, b)
 	}
 
 	// Top-level statements that aren't declarations
@@ -96,10 +93,10 @@ func (g *Generator) generateFile(f *File, fid analysis.FileID) {
 			continue // Public declarations are always Objects
 		}
 		if _, ok := declStmts[stmt]; !ok {
-			jsStmt := g.convertStatement(stmt, g.Context)
-			f.IR.Statements = append(f.IR.Statements, jsStmt)
+			g.convertStatement(stmt, b)
 		}
 	}
+	f.IR.Statements = b.stmts
 
 	// TODO: Convert comments to offsets of IR nodes
 	// f.IR.Comments = make([]jsir.Comment, 0, len(f.AST.Comments))
@@ -129,9 +126,12 @@ func (g *Generator) canCodegen(obj *analysis.Object) bool {
 }
 
 func (g *Generator) convertBlock(stmts *ast.Block, ctx *analysis.Context) *jsir.Block {
-	block := &jsir.Block{make([]jsir.Statement, 0, len(stmts.Body))}
-	for _, stmt := range stmts.Body {
-		_ = stmt
+	if len(stmts.Body) == 0 {
+		return &jsir.Block{nil}
 	}
-	return block
+	b := &block{stmts: make([]jsir.Statement, 0, len(stmts.Body)), ctx: ctx}
+	for _, stmt := range stmts.Body {
+		g.convertStatement(stmt, b)
+	}
+	return &jsir.Block{b.stmts}
 }

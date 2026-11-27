@@ -1,13 +1,29 @@
 package codegen
 
 import (
+	"fmt"
+	"slices"
+
 	"github.com/klarlanguage/klar/internal/analysis"
 	"github.com/klarlanguage/klar/internal/ast"
 	"github.com/klarlanguage/klar/internal/ir/jsir"
 	"github.com/klarlanguage/klar/internal/lexer"
 )
 
-func (g *Generator) convertStatement(stmt ast.Statement, ctx *analysis.Context) jsir.Statement {
+type block struct {
+	stmts []jsir.Statement
+	ctx   *analysis.Context
+}
+
+func (b *block) insertStmt(stmt jsir.Statement) { b.stmts = append(b.stmts, stmt) }
+func (b *block) growStmts(n int)                { b.stmts = slices.Grow(b.stmts, n) }
+
+func (g *Generator) convertStatement(stmt ast.Statement, b *block) (res jsir.Statement) {
+	defer func() {
+		if res != nil {
+			b.stmts = append(b.stmts, res)
+		}
+	}()
 	switch stmt := stmt.(type) {
 	case *ast.VariableDeclaration:
 		_ = stmt
@@ -15,7 +31,7 @@ func (g *Generator) convertStatement(stmt ast.Statement, ctx *analysis.Context) 
 		while := &jsir.WhileStatement{}
 		var cond jsir.Expression
 		if stmt.Condition != nil {
-			cond = g.convertExpression(stmt.Condition)
+			cond = g.convertExpression(stmt.Condition, b)
 		}
 
 		// If the statement has a binding:
@@ -33,7 +49,7 @@ func (g *Generator) convertStatement(stmt ast.Statement, ctx *analysis.Context) 
 			varAssign = &jsir.AssignmentExpression{
 				Assignee: bindingDecl.Variable,
 				Operator: jsir.OpEqual,
-				Value:    g.convertExpression(stmt.Variable.Values[0]),
+				Value:    g.convertExpression(stmt.Variable.Values[0], b),
 			}
 		}
 
@@ -46,9 +62,9 @@ func (g *Generator) convertStatement(stmt ast.Statement, ctx *analysis.Context) 
 			while.Condition = &jsir.CommaExpression{[]jsir.Expression{varAssign, cond}}
 		}
 
-		while.Body = g.convertBlock(stmt.Body, g.Module.Info.Blocks[stmt].Context)
+		while.Body = g.convertBlock(stmt.Body, g.Module.Info.Blocks[stmt.Body].Context)
 		if bindingDecl != nil {
-			return &jsir.StatementChain{[]jsir.Statement{bindingDecl, while}}
+			b.insertStmt(bindingDecl)
 		}
 		return while
 	case *ast.ForStatement:
@@ -72,18 +88,18 @@ func (g *Generator) convertStatement(stmt ast.Statement, ctx *analysis.Context) 
 		}
 		var singleRHS jsir.Expression
 		if stmt.IsSingleRHS() {
-			singleRHS = g.convertExpression(stmt.Values[0])
+			singleRHS = g.convertExpression(stmt.Values[0], b)
 		}
 		for i, lhs := range stmt.Assignee {
 			// TODO: JS doesn't support object destructures in assignments
-			jsLHS := g.convertExpression(lhs)
+			jsLHS := g.convertExpression(lhs, b)
 			assignExpr := &jsir.AssignmentExpression{
 				Assignee: jsLHS,
 				Value:    singleRHS,
 				Operator: ConvertOperator(stmt.Operator.Kind),
 			}
 			if !stmt.IsSingleRHS() {
-				assignExpr.Value = g.convertExpression(stmt.Values[i])
+				assignExpr.Value = g.convertExpression(stmt.Values[i], b)
 			}
 			if len(stmt.Assignee) == 1 {
 				return &jsir.ExpressionStatement{assignExpr}
@@ -94,7 +110,7 @@ func (g *Generator) convertStatement(stmt ast.Statement, ctx *analysis.Context) 
 	case *ast.ReturnStatement:
 		var expr jsir.Expression
 		if stmt.Value != nil {
-			expr = g.convertExpression(stmt.Value)
+			expr = g.convertExpression(stmt.Value, b)
 		}
 		return &jsir.ReturnStatement{expr}
 	case *ast.NextStatement:
@@ -108,7 +124,7 @@ func (g *Generator) convertStatement(stmt ast.Statement, ctx *analysis.Context) 
 		}
 		return &jsir.BreakStatement{}
 	case *ast.ExpressionStatement:
-		return &jsir.ExpressionStatement{g.convertExpression(stmt.Expression)}
+		return &jsir.ExpressionStatement{g.convertExpression(stmt.Expression, b)}
 	case *ast.ImportStatement:
 		// Don't know what to do yet
 		// Because dead code elimination and bundling have to occur, the import
@@ -121,8 +137,9 @@ func (g *Generator) convertStatement(stmt ast.Statement, ctx *analysis.Context) 
 }
 
 func ConvertOperator(op lexer.TokenType) jsir.Operator {
-	return map[lexer.TokenType]jsir.Operator{
-		lexer.Equal:          jsir.OpEqual,
+	res, ok := map[lexer.TokenType]jsir.Operator{
+		lexer.Equal:          jsir.OpAssign,
+		lexer.EqualEqual:     jsir.OpEqual,
 		lexer.NotEqual:       jsir.OpNotEqual,
 		lexer.GreaterThan:    jsir.OpGreaterThan,
 		lexer.LessThan:       jsir.OpLessThan,
@@ -143,5 +160,12 @@ func ConvertOperator(op lexer.TokenType) jsir.Operator {
 		lexer.SlashEqual:     jsir.OpDivideEqual,
 		lexer.PercentEqual:   jsir.OpRemainderEqual,
 		lexer.CaretEqual:     jsir.OpExponentEqual,
+		lexer.In:             jsir.OpIn,
+		lexer.Or:             jsir.OpLogicalOr,
+		lexer.And:            jsir.OpLogicalAnd,
 	}[op]
+	if !ok {
+		panic(fmt.Sprintf("unhandled Klar operator: %s", op))
+	}
+	return res
 }

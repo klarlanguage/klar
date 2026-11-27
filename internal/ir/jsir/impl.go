@@ -1,6 +1,5 @@
 package jsir
 
-func (*StatementChain) _stmt()  {}
 func (*IfStatement) _stmt()     {}
 func (*SwitchStatement) _stmt() {}
 

@@ -10,7 +10,27 @@ import (
 func (w *Writer) writeExpression(expr jsir.Expression) {
 	switch expr := expr.(type) {
 	case *jsir.ArrayLiteral:
+		w.writeByte('[')
+		for i, expr := range expr.Items {
+			if i > 0 {
+				w.writeString(", ")
+			}
+			w.writeExpression(expr)
+		}
+		w.writeByte(']')
 	case *jsir.ArrowFunction:
+		if expr.Async {
+			w.writeString("async ")
+		}
+		w.writeString(" => ")
+		switch body := expr.Body.(type) {
+		case *jsir.Block:
+			w.writeBlock(body)
+		case jsir.Expression:
+			w.writeExpression(body)
+		default:
+			panic(fmt.Sprintf("ArrowFunction.Body must be Expression or *Block, got %T", body))
+		}
 	case *jsir.AssignmentExpression:
 		w.writeAssignmentExpr(expr, false)
 	case *jsir.BinaryExpression:
@@ -31,9 +51,27 @@ func (w *Writer) writeExpression(expr jsir.Expression) {
 	case *jsir.ClassDeclaration:
 		w.writeClass(expr)
 	case *jsir.CommaExpression:
+		for i, expr := range expr.Items {
+			if i > 0 {
+				w.writeString(", ")
+			}
+			w.writeExpression(expr)
+		}
 	case *jsir.FunctionDeclaration:
 		w.writeFunction(expr, true)
 	case *jsir.MemberExpression:
+		w.writeExpression(expr.Object)
+		if expr.Optional {
+			w.writeString("?.")
+		}
+		if expr.Computed {
+			w.writeByte('[')
+			w.writeExpression(expr.Property)
+			w.writeByte(']')
+		} else {
+			w.writeByte('.')
+			w.writeExpression(expr.Property)
+		}
 	case *jsir.NullLiteral:
 		w.writeString("null")
 	case *jsir.NumericLiteral:
@@ -42,6 +80,7 @@ func (w *Writer) writeExpression(expr jsir.Expression) {
 		// in scientific notation
 		w.writeString(strconv.FormatFloat(expr.Value, 'g', -1, 64))
 	case *jsir.ObjectLiteral:
+		w.writeObjectLiteral(expr)
 	case *jsir.PostfixUnaryExpression:
 		w.writeString(expr.Operator.String())
 		// Should always be false since the operator is alway '++' or '--'
@@ -71,6 +110,11 @@ func (w *Writer) writeExpression(expr jsir.Expression) {
 		w.writeString(" : ")
 		w.writeExprWithPrec(expr.False, 0)
 	case *jsir.TemplateLiteral:
+		if expr.Tag != nil {
+			w.writeExprWithPrec(expr.Tag, 0)
+		}
+		w.writeByte('`')
+		w.writeByte('`')
 	case *jsir.UnaryExpression:
 		w.writeString(expr.Operator.String())
 		if expr.Operator.ShouldAddSpace() {
@@ -243,4 +287,13 @@ func (w *Writer) writeCallExpr(call *jsir.CallExpression) {
 		w.writeExprWithPrec(arg, 0)
 	}
 	w.writeByte(')')
+}
+
+func (w *Writer) writeObjectLiteral(expr *jsir.ObjectLiteral) {
+	if len(expr.Entries) == 0 {
+		w.writeString("{}")
+		return
+	}
+	w.writeString("{ ")
+	w.writeString(" }")
 }
