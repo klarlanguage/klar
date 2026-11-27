@@ -53,7 +53,7 @@ func Run(cmd *Command) {
 		panic("command: Run(nil)")
 	}
 	if cmd.Run == nil {
-		panic("cannot run command '" + cmd.Name + ": Run function is not defined")
+		panic("cannot run command '" + cmd.Name + "': Run function is not defined")
 	}
 	if cmd.Flags == nil {
 		cmd.Flags = argparse.NewParser()
