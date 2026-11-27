@@ -98,6 +98,7 @@ var Commands = map[string]*command.Command{
 		ShortDescription: "Upgrade Klar to the latest version",
 		Run:              upgrade.Run,
 		LongDescription:  upgrade.LongDescription,
+		Flags:            upgrade.Flags,
 	},
 	"lsp": {
 		ShortDescription: "Start the Klar Language Server (for IDEs only)",

@@ -19,7 +19,9 @@ var Flags = argparse.NewParser("[inputs...]").
 	BoolFlag("sourcemap", "Whether to generated sourcemaps for debugging", true).
 	BoolFlag("inline-sourcemap", "Whether to generated inline sourcemaps for debugging", false).
 	BoolFlag("jsdoc", "Whether to generate JSDoc comments in JavaScript output. Recommended if '--declaration' is disabled", false).
-	StringFlag("config", "Path to a klar.build config file. By default, it is searched for in the current and parent directories", "file", "", "c").
+	StringFlag("config",
+		"Path to a 'klar.build' config file. By default, ones inside each input are used", "file", "", "c",
+	).
 	BoolFlag("copy-node-modules", "Whether to copy node_modules and package.json to the output directory", true).
 	BoolFlag("json-output", "Show logs and error messages in JSON format", false)
 

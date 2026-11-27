@@ -31,6 +31,9 @@ import (
 	"github.com/klarlanguage/klar/pkg/argparse"
 )
 
+var Flags = argparse.NewParser().
+	BoolFlag("dry-run", "Try to download the update, but don't apply it", false)
+
 // The URL to the GitHub API endpoint used for querying Klar releases.
 const ReleasesURL = "https://api.github.com/repos/klarlanguage/klar/releases"
 
@@ -42,13 +45,10 @@ const (
 // The regular expression for Klar release assets published to GitHub.
 var BinaryAssetRegex = regexp.MustCompile(
 	// Arch not provided for browser (Wasm) binary
-	`^klar-(?:(?P<commit>[0-9a-f]+)|(?P<version>[0-9\._a-z]+))-(?P<os>[a-z]+)(?:-(?P<arch>[-\w_]+))?`,
+	`^klar-(?:(?P<commit>[0-9a-f]+)|(?P<version>[0-9\._a-z]+))-(?P<os>[a-z]+)(?:-(?P<arch>[\w_]+))?`,
 )
 
-var (
-	dryRun              = os.Getenv("KLAR_DRY_RUN") == "1" // For development purposes
-	displayManualUpdate = true
-)
+var displayManualUpdate = true
 
 func Run(c *argparse.Parser) {
 	var ok bool
@@ -123,7 +123,7 @@ func Run(c *argparse.Parser) {
 	binDir := filepath.Dir(exec)
 
 	// 5. Extract Klar/Glas binaries and standard library
-	if !dryRun {
+	if !c.Flag("dry-run").Bool() {
 		// Windows doesn't let you delete or overwrite the running Klar
 		// executable, so instead we rename the current one to klar.old
 		// and extract the new version in its place. When the new klar
