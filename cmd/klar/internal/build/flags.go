@@ -25,10 +25,7 @@ var Flags = argparse.NewParser("[inputs...]").
 	BoolFlag("copy-node-modules", "Whether to copy node_modules and package.json to the output directory", true).
 	BoolFlag("json-output", "Show logs and error messages in JSON format", false)
 
-var (
-	klarBuildFlags = []string{"watch", "output", "target"}
-	jsFlags        = []string{
-		"declaration", "minify", "inline-sourcemap", "sourcemap", "jsdoc",
-		"copy-node-modules", "banner", "bundle", "declaration-path",
-	}
-)
+var jsFlags = []string{
+	"declaration", "minify", "inline-sourcemap", "sourcemap", "jsdoc",
+	"copy-node-modules", "banner", "bundle", "declaration-path",
+}

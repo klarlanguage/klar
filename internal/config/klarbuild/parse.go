@@ -61,3 +61,18 @@ var BundleModes = map[string]any{
 	"all":       BundleStd,
 	"true":      BundleStd,
 }
+
+// Overrides describes the overrides made to a klar.build configuration.
+type Overrides uint16
+
+const (
+	DeclarationOverriden Overrides = 1 << iota
+	DeclarationPathOverriden
+	Minify
+	SourcemapOverriden
+	JSDocOverriden
+	CopyNodeModulesOverriden
+	BannerOverriden
+	BundleOverriden
+	TargetOverriden
+)

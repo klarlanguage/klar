@@ -7,9 +7,7 @@ import (
 
 	"github.com/klarlanguage/klar/internal/ast"
 	"github.com/klarlanguage/klar/internal/config/glaspack"
-	"github.com/klarlanguage/klar/internal/config/klarbuild"
 	"github.com/klarlanguage/klar/internal/module"
-	"github.com/klarlanguage/klar/internal/target"
 	"github.com/klarlanguage/klar/pkg/klon"
 )
 
@@ -28,7 +26,7 @@ func IsTestFile(file string) bool {
 // klarBuildMode == 1: No klar.build is resolved. The caller is expected
 // to parse the klar.build and set i.Config.
 // klarBuildMode == 2: ResolveInput uses the default klar.build
-func (c *Compiler) ResolveInput(s string, klarBuildMode int) (i *Input, err error) {
+func (c *Compiler) ResolveInput(s string) (i *Input, err error) {
 	// If the input refers to a module import path (`@...`), use the manifest for the cwd
 	switch {
 	case s == "-":
@@ -65,30 +63,8 @@ func (c *Compiler) ResolveInput(s string, klarBuildMode int) (i *Input, err erro
 			return nil, err
 		}
 	}
-	// Find the klar.build file
-	switch klarBuildMode {
-	case 0:
-		if configPath := i.ResolveKlarBuild(c); configPath != "" {
-			var warn []*klon.Error
-			if i.KlarBuild, warn, err = klarbuild.Parse(configPath); err != nil {
-				return nil, err
-			}
-			c.PrintKlonWarnings(warn, configPath)
-			break
-		}
-		fallthrough
-	case 2:
-		i.KlarBuild = klarbuild.Default()
-	case 1:
-		// A forced klar.build will be parsed by the caller
-	}
 	// Set the input's target
-	// klar.build's Target has priority over the manifest's
-	if i.KlarBuild != nil {
-		i.Targets = []target.Target{i.KlarBuild.Target}
-	} else if i.Manifest != nil {
-		i.Targets = i.Manifest.Target
-	}
+	i.Targets = i.Manifest.Target
 	return i, nil
 }
 
@@ -145,6 +121,15 @@ func (i *Input) ResolveKlarBuild(c *Compiler) (path string) {
 		}
 	}
 }
+
+/* if configPath := i.ResolveKlarBuild(c); configPath != "" {
+	var warn []*klon.Error
+	if i.KlarBuild, warn, err = klarbuild.Parse(configPath); err != nil {
+		return nil, err
+	}
+	c.PrintKlonWarnings(warn, configPath)
+	break
+} */
 
 var manifestCache map[string]*glaspack.Manifest
 

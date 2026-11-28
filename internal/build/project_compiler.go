@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/klarlanguage/klar/internal/analysis"
@@ -183,6 +184,8 @@ func (pc *ProjectCompiler) CompileInputs() (modules []*Module, err error) {
 	return modules, nil
 }
 
+// TODO: Move this step to when dependencies are resolved. If a dependency isn't
+// found or disk, or is corrupt, download all dependencies.
 func (pc *ProjectCompiler) DownloadDeps() error {
 	pc.Progress.DownloadingDeps()
 	for _, input := range pc.Inputs {
@@ -217,7 +220,7 @@ func (pc *ProjectCompiler) CompileBootstrapped() error {
 	importPath := imports.ImportPath{"klar", "_builtin"}
 	modulePath := module.SystemDirs.Std + sep +
 		module.SrcDir + sep + filepath.Join(importPath...)
-	inp, err := pc.ResolveInput(modulePath, 0)
+	inp, err := pc.ResolveInput(modulePath)
 	if err != nil {
 		// TODO: In the future, automatically download the stdlib if not found.
 		// There are some valid reasons why it wouldn't be installed, such as if
@@ -233,21 +236,28 @@ func (pc *ProjectCompiler) CompileBootstrapped() error {
 	for _, projInp := range pc.Inputs {
 		inp.Targets = append(inp.Targets, projInp.Targets...)
 	}
-	compiler := NewPackageCompiler(pc.Compiler, inp)
-	compiler.Deps = &Deps{}
-	compiler.Root = false
-	compiler.EnforceTargetSupport = false
-	if _, err := compiler.Compile(); err != nil && err != errMaxErrors {
+	pkc := NewPackageCompiler(pc.Compiler, inp)
+	pkc.Deps = &Deps{}
+	pkc.Root = false
+	pkc.EnforceTargetSupport = false
+	if _, err := pkc.Compile(); err != nil && err != errMaxErrors {
 		return err
 	}
-	if len(compiler.Errors) > 0 {
-		if pc.Compiler.Logger.Enabled(context.Background(), slog.LevelError) {
-			pc.Compiler.Logger.Error("Modules being bootstrapped failed to compile")
-			pc.Compiler.Logger.Error("========== BEGIN BOOTSTRAP ERRORS ==========")
-			pc.PrintAllErrors(compiler.Errors)
-			pc.Compiler.Logger.Error("========== END BOOTSTRAP ERRORS ==========")
+	if len(pkc.Errors) > 0 {
+		if pc.Logger.Enabled(context.Background(), slog.LevelError) {
+			// For debugging, write the pretty errors to the logger
+			pc.Logger.Error("Modules being bootstrapped failed to compile")
+
+			// To ensure errors are written to any $KLAR_LOG_FILE instead of stderr
+			oldOutput := pkc.Reporter.Output
+			defer func() { pkc.Reporter.Output = oldOutput }()
+
+			var b strings.Builder
+			pkc.Reporter.Output = &b
+			pc.PrintAllErrors(pkc.Errors)
+			pc.Logger.Error(b.String())
 		}
-		return &InterfaceError{Code: ErrInternalCompileError, Err: compiler.Errors[0]}
+		return &InterfaceError{Code: ErrInternalCompileError, Err: pkc.Errors[0]}
 	}
 	return nil
 }
@@ -276,7 +286,7 @@ func (pc *ProjectCompiler) CompileDep(
 		// they will refer to the same package, we're only compiling from one.
 		// Though the package will be cached to each of the inputs' cache dir
 		root := inputs[0].PkgInfo.PackageDirOf(lockPkg)
-		inp, err := pc.ResolveInput(root, 0)
+		inp, err := pc.ResolveInput(root)
 		if err != nil {
 			return nil, &InterfaceError{
 				Code:  ErrDepNotFound,

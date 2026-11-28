@@ -61,3 +61,5 @@ func (s *BuildStatus) printf(f string, args ...any) {
 }
 
 func (s *BuildStatus) rel(path string) string { return util.RelPath(s.cwd, path) }
+
+func (s *BuildStatus) Clear() { fmt.Print(ansi.ClearLine) }

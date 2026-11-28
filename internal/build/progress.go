@@ -9,6 +9,7 @@ type Progress interface {
 	GeneratingJS(curr, total int)
 	OptimizingModule(module string, curr, total int)
 	WritingModules()
+	Clear() // Clears the line
 }
 
 var _ Progress = HiddenProgress{}
@@ -23,3 +24,4 @@ func (HiddenProgress) CheckingModule(string, int, int)   {}
 func (HiddenProgress) GeneratingJS(int, int)             {}
 func (HiddenProgress) OptimizingModule(string, int, int) {}
 func (HiddenProgress) WritingModules()                   {}
+func (HiddenProgress) Clear()                            {}

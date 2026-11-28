@@ -3,9 +3,7 @@ package build
 import (
 	"fmt"
 	"log/slog"
-	"maps"
 	"os"
-	"slices"
 	"time"
 
 	"github.com/klarlanguage/klar/internal/build"
@@ -21,9 +19,9 @@ import (
 	"github.com/klarlanguage/klar/pkg/klon"
 )
 
-// Build executes the "klar build" command.
-func Build(r *argparse.Parser) {
-	inputArgs := r.VarArgByName("inputs")
+// Run executes the "klar build" command.
+func Run(p *argparse.Parser) {
+	inputArgs := p.VarArgByName("inputs")
 	cwd, err := build.Cwd()
 	if err != nil {
 		cli.FailureError(err)
@@ -32,8 +30,8 @@ func Build(r *argparse.Parser) {
 	pc := build.NewProjectCompiler(c)
 
 	// 1. Logging
-	jsonOutput := r.Flag("json-output").Bool()
-	if err := build.SetLogger(c, r.Flag("verbose").Bool(), jsonOutput); err != nil {
+	jsonOutput := p.Flag("json-output").Bool()
+	if err := build.SetLogger(c, p.Flag("verbose").Bool(), jsonOutput); err != nil {
 		cli.FailureError(err)
 	}
 	defer func() {
@@ -41,58 +39,102 @@ func Build(r *argparse.Parser) {
 			cli.Failure("Failed to write log file:", err)
 		}
 	}()
-
-	c.StartTime = time.Now() // Start timer at resolution process
 	if !jsonOutput {
 		c.Progress = NewBuildStatus(cwd)
 	}
 
-	// 2. --config flag
-	var (
-		configFlag      = r.Flag("config")
-		forcedKlarBuild *klarbuild.File
-		klarBuildMode   int
-	)
-	if configFlag.String() != "" {
-		configPath := configFlag.String()
-		var warn []*klon.Error
-		if forcedKlarBuild, warn, err = klarbuild.Parse(configPath); err != nil {
-			c.FailWithError(err)
+	// Steps 2-4 are shared by other commands like run, test, lint, and format
+	res, err := RunBuild(pc, inputArgs, &CLIFlags{
+		Parser:         p,
+		ConfigFlagName: "config",
+		JSFlags:        jsFlags,
+	})
+
+	// 5. Print error/success messages
+	// =========
+
+	// If we're showing the compiler's progress, clear the line before showing errors
+	c.Progress.Clear()
+	switch {
+	case jsonOutput:
+		if err := jsonerrors.WriteTo(os.Stdout, res, err); err != nil {
+			cli.Error("Failed to write JSON errors:", err)
 		}
-		c.PrintKlonWarnings(warn, configPath)
-		ParseFlags(r, &build.Input{KlarBuild: forcedKlarBuild})
-		klarBuildMode = 1
-	} else if configFlag.Set {
-		klarBuildMode = 2 // Provided, but empty. Use default config
+		fmt.Println() // jsonerrors doesn't append a newline
+		if err != nil || len(res.Errors) > 0 {
+			cli.Exit(1)
+		}
+	case err != nil:
+		// Critical error
+		HandleCriticalBuildError(err, c)
+	default:
+		// Successes, errors, and/or warnings
+		if ok := ShowResult(res, c); !ok {
+			cli.Exit(1)
+		}
 	}
-	// If unset, a klar.build will be searched for
+}
+
+type CLIFlags struct {
+	*argparse.Parser
+	ConfigFlagName string // Flag that specifies a klar.build path, or empty if unsupported
+	JSFlags        []string
+}
+
+func RunBuild(
+	pc *build.ProjectCompiler, inputArgs []string, flags *CLIFlags,
+) (res *build.Result, err error) {
+	c := pc.Compiler
+	c.StartTime = time.Now() // Start timer at resolution process
+
+	// 2. --config flag
+	// Providing it will use the klar.build for all inputs, otherwise, klar.build
+	// files will be searched inside each input and module.
+	if flags != nil && flags.ConfigFlagName != "" {
+		configFlag := flags.Flag(flags.ConfigFlagName)
+		if configFlag.String() != "" {
+			configPath := configFlag.String()
+			var warn []*klon.Error
+			if c.ForcedKlarBuild, warn, err = klarbuild.Parse(configPath); err != nil {
+				c.FailWithError(err)
+			}
+			c.PrintKlonWarnings(warn, configPath)
+		} else if configFlag.Set {
+			// Empty --config flag: use default klar.build
+			c.ForcedKlarBuild = klarbuild.Default()
+		}
+	}
+	if flags != nil {
+		// Apply CLI overrides, whether the --config flag was used or not
+		c.ForcedKlarBuild, c.KlarBuildOverrides = ParseJSFlags(flags, c.ForcedKlarBuild, true)
+
+		// Apply CLI override for the target, since it isn't considered a JS flag
+		if _, ok := flags.FlagDefs["target"]; ok && flags.Flag("target").Set {
+			if c.ForcedKlarBuild == nil {
+				c.ForcedKlarBuild = &klarbuild.File{}
+			}
+			c.ForcedKlarBuild.Target = flags.Flag("target").EnumValue().(target.Target)
+			c.KlarBuildOverrides |= klarbuild.TargetOverriden
+		}
+	}
 
 	// 3. Resolve command-line inputs
-	pc.Inputs = make([]*build.Input, 0, len(inputArgs))
+	pc.Inputs = make([]*build.Input, 0, max(len(inputArgs), 1))
 	addInput := func(path string) {
-		input, err := pc.ResolveInput(path, klarBuildMode)
-		switch {
-		case err != nil:
+		input, err := pc.ResolveInput(path)
+		if err != nil {
 			if err, ok := err.(*build.FilesystemError); ok && err.IsNotExist() {
 				cli.ErrNotFound(path, "input")
 			}
 			c.FailWithError(err)
-		case forcedKlarBuild != nil:
-			// Use the klar.build config from the --config flag
-			input.KlarBuild = forcedKlarBuild
-		default:
-			// Apply command-line flags
-			ParseFlags(r, input)
 		}
 		pc.Inputs = append(pc.Inputs, input)
 
 		// Hide progress if stdin is an input
 		if input.Kind == build.KindStdin {
-			c.Progress = build.HiddenProgress{}
 			// Clear the line created by ResolvingInput
-			if _, ok := c.Progress.(*BuildStatus); ok {
-				fmt.Print(ansi.ClearLine)
-			}
+			c.Progress.Clear()
+			c.Progress = build.HiddenProgress{}
 		}
 	}
 	for i, path := range inputArgs {
@@ -109,48 +151,24 @@ func Build(r *argparse.Parser) {
 		addInput(pkgPath)
 	}
 
-	// 4. Resolve lockfiles and download dependencies for each input
-	if err := pc.DownloadDeps(); err != nil {
-		c.FailWithError(err)
-	}
-
-	// 5. Compile!
+	// 4. Compile!
 	// TODO: error if --output is file and there are multiple inputs
-	res, err := pc.Compile()
+	res, err = pc.Compile()
+	return
+}
 
-	// 6. Print error/success messages
-
-	// If we're showing the compiler's progress, clear the line before showing errors
-	if !c.ProgressHidden() {
-		fmt.Print(ansi.ClearLine)
-	}
-	switch {
-	case jsonOutput:
-		if err := jsonerrors.WriteTo(os.Stdout, res, err); err != nil {
-			cli.Error("Failed to write JSON errors:", err)
-		}
-		fmt.Println() // jsonerrors doesn't append a newline
-		if err != nil || len(res.Errors) > 0 {
-			cli.Exit(1)
-		}
-	case err != nil:
-		// Critical error
-		switch err := err.(type) {
-		case *build.InterfaceError:
-			// For InterfaceErrors: print a prettier error
-			c.PrintInterfaceOrKlonError(err)
-			cli.Exit(1)
-		case *build.FilesystemError:
-			cli.FailureError(err)
-		default:
-			// Errors should be a struct such as InterfaceError or FilesystemError
-			panic(fmt.Sprintf("error %T should be wrapped: %[1]v", err))
-		}
+// HandleCriticalBuildError handles an error returned from [build.ProjectCompiler.Compile]
+func HandleCriticalBuildError(err error, c *build.Compiler) {
+	switch err := err.(type) {
+	case *build.InterfaceError:
+		// For InterfaceErrors: print a prettier error
+		c.PrintInterfaceOrKlonError(err)
+		cli.Exit(1)
+	case *build.FilesystemError:
+		cli.FailureError(err)
 	default:
-		// Successes, errors, and/or warnings
-		if ok := ShowResult(res, c); !ok {
-			cli.Exit(1)
-		}
+		// Errors should be a struct such as InterfaceError or FilesystemError
+		panic(fmt.Sprintf("error %T should be wrapped: %[1]v", err))
 	}
 }
 
@@ -213,81 +231,56 @@ func ShowResult(res *build.Result, c *build.Compiler) (ok bool) {
 	return true
 }
 
-// ParseFlags parses flags from r into o.
-func ParseFlags(r *argparse.Parser, i *build.Input) {
-	for _, setting := range klarBuildFlags {
-		flag, ok := r.Flags[setting]
-		if !ok || !flag.Set {
-			continue
-		}
-		if i.KlarBuild == nil && setting != "target" {
-			i.KlarBuild = &klarbuild.File{}
-		}
-		f := i.KlarBuild
-		switch setting {
-		case "watch":
-			f.Watch = flag.Value.(bool)
-		case "output":
-			f.Output = flag.Value.([]string)
-		case "target":
-			i.Targets = []target.Target{flag.EnumValue().(target.Target)}
-			if f != nil {
-				f.Target = i.Targets[0]
-			}
-		default:
-			panic("unhandled flag: " + setting)
-		}
-	}
-	for _, setting := range jsFlags {
+// ParseJSFlags parses flags from r into o.
+func ParseJSFlags(r *CLIFlags, kb *klarbuild.File, hasJSInput bool) (
+	_ *klarbuild.File, overrides klarbuild.Overrides,
+) {
+	for _, setting := range r.JSFlags {
 		v, ok := r.Flags[setting]
 		if !ok || !v.Set {
 			continue
 		}
-		if i.KlarBuild == nil {
-			i.KlarBuild = &klarbuild.File{}
+		if kb == nil {
+			kb = &klarbuild.File{}
 		}
-		f := i.KlarBuild
-		// Check if a JavaScript flag was used when not targeting JavaScript
-		isJS := func(t target.Target) bool { return t.IsJavaScript() }
-		if !slices.ContainsFunc(i.Targets, isJS) {
-			// Get the first JS flag the user provided
-			firstJSFlag := slices.SortedFunc(maps.Keys(r.Flags), func(a, b string) int {
-				return r.Flags[a].Index - r.Flags[b].Index
-			})[0]
+		// Check if a JavaScript flag was used when no inputs target JS
+		if !hasJSInput {
+			// TODO: I would like to use the first JS flag the user provided
 			cli.Failure(fmt.Sprintf(
 				"Can't use JavaScript flag '--%s' on the %s target",
-				firstJSFlag, f.Target.Name(),
+				setting, kb.Target.Name(),
 			))
 		}
 		switch setting {
 		case "declaration":
-			f.JS.Declaration = v.Value.(bool)
+			kb.JS.Declaration = v.Value.(bool)
 		case "minify":
-			f.JS.Minify = v.Bool()
+			kb.JS.Minify = v.Bool()
 		case "inline-sourcemap":
 			if v.Bool() {
-				f.JS.Sourcemap = klarbuild.SourceMapInline
+				kb.JS.Sourcemap = klarbuild.SourceMapInline
 			}
 		case "sourcemap":
 			if v.Bool() {
-				f.JS.Sourcemap = klarbuild.SourceMapEnabled
+				kb.JS.Sourcemap = klarbuild.SourceMapEnabled
 			} else {
-				f.JS.Sourcemap = klarbuild.SourceMapDisabled
+				kb.JS.Sourcemap = klarbuild.SourceMapDisabled
 			}
 		case "jsdoc":
-			f.JS.JSDoc = v.Bool()
+			kb.JS.JSDoc = v.Bool()
 		case "copy-node-modules":
-			f.JS.CopyNodeModules = v.Bool()
+			kb.JS.CopyNodeModules = v.Bool()
 		case "banner":
-			f.JS.Banner = v.String()
+			kb.JS.Banner = v.String()
 		case "bundle":
-			f.JS.Bundle = v.EnumValue().(klarbuild.BundleMode)
+			kb.JS.Bundle = v.EnumValue().(klarbuild.BundleMode)
 		case "declaration-path":
-			f.JS.DeclarationPath = v.String()
+			kb.JS.DeclarationPath = v.String()
 		default:
 			panic("unhandled flag: " + setting)
 		}
 	}
+	return kb, overrides
 }
 
 const LongDescription = `Compiles Klar source files at the provided file or module paths. If none are provided, inputs defined in 'klar.build', the build configuration file, are used.

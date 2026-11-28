@@ -24,7 +24,7 @@ type File struct {
 	Target target.Target
 	// Enable verbose logging during build. Useful for bug reporting.
 	Verbose bool
-	// Options for the type checker
+	// Options for the type checker.
 	Checker *CheckerOptions
 }
 

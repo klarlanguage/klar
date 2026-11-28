@@ -22,7 +22,7 @@ var Commands = map[string]*command.Command{
 		LongDescription:  build.LongDescription,
 		SeeAlso:          s{"run", "test", "check"},
 		Flags:            build.Flags,
-		Run:              build.Build,
+		Run:              build.Run,
 		Examples: []command.ExampleCmd{
 			// TODO: Give these example projects creative names
 			{"build", nil, nil, "Build the current project to the default output directory"},

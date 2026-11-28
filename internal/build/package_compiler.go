@@ -109,7 +109,7 @@ func (pkc *PackageCompiler) LoadStdlibDeps(stdDeps []imports.ImportPath) error {
 			continue
 		}
 		modulePath := module.ModuleDirOf(importPath, stdDir, stdDir)
-		inp, err := pkc.ResolveInput(modulePath, 0)
+		inp, err := pkc.ResolveInput(modulePath)
 		if err != nil {
 			// Not in the standard library. An error will be reported by the typechecker.
 			return nil

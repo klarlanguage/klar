@@ -39,6 +39,11 @@ type Compiler struct {
 	collectMu sync.Mutex
 	IsDebug   bool
 	FS        CompilerFS
+	// The klar.build config used for all modules. Can be nil
+	ForcedKlarBuild *klarbuild.File
+	// The overrides made to klar.build configurations. New values will be
+	// taken from [Compiler.ForcedKlarBuild].
+	KlarBuildOverrides klarbuild.Overrides
 	*slog.Logger
 }
 
@@ -86,6 +91,7 @@ const (
 )
 
 func (mode BuildMode) ShouldTypecheck() bool { return mode != ModeParse }
+func (mode BuildMode) ShouldOptimize() bool  { return mode == ModeBuild }
 func (mode BuildMode) ShouldCodegen() bool {
 	return mode != ModeParse && mode != ModeAnalyze
 }
