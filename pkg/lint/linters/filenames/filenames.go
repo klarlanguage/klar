@@ -24,6 +24,6 @@ var (
 	RuleNameMustMatchType   = Linter.NewRule("nameMustMatchType")
 )
 
-func Run(lc *lint.LintContext, opts *lint.LinterSettings) error {
+func Run(lc *lint.LinterContext, opts *lint.LinterSettings) error {
 	return nil
 }

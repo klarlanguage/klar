@@ -11,7 +11,7 @@ type Linter struct {
 	// Settings for the linter and/or rules, or nil if neither accept settings
 	Settings func() *LinterSettings
 
-	Run func(lc *LintContext, opts *LinterSettings) error
+	Run func(lc *LinterContext, opts *LinterSettings) error
 
 	// TODO: Linter dependencies (need to run before this) and option to allow running
 	// on a program with errors
@@ -36,15 +36,4 @@ func (l *Linter) NewRule(code string) Rule {
 	r := Rule{l, code}
 	l.Rules = append(l.Rules, r)
 	return r
-}
-
-type LintContext struct {
-	Diagnostics []*Diagnostic
-}
-
-func (lc *LintContext) RuleEnabled(r Rule) bool {
-	return true
-}
-
-func (lc *LintContext) Report(d *Diagnostic) {
 }

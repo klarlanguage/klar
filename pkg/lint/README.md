@@ -11,10 +11,10 @@ Linters don't have to be written in Klar (there is no analysis API for Klar yet)
 
 ## Future analysis APIs for linting
 
-Go's `inspector`, including `Preorder`
-
-<https://pkg.go.dev/golang.org/x/tools/go/ast/inspector>
+Go's [`inspector`](https://pkg.go.dev/golang.org/x/tools/go/ast/inspector), including `Preorder`
 
 ## References
 
-`go vet`'s passes, such as [`composite`](https://github.com/golang/tools/tree/master/go/analysis/passes/composite/composite.go)
+- `go vet`'s passes, such as [`composites`](https://github.com/golang/tools/tree/master/go/analysis/passes/composite/composite.go)
+- Go's [`unitchecker`](https://github.com/golang/tools/tree/master/go/analysis/unitchecker/unitchecker.go), which runs the analyzers
+- [`Analyzer`](https://github.com/golang/tools/tree/master/go/analysis/analysis/analysis.go) from `go vet`, which is similar to `Runner`

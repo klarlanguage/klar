@@ -1,8 +1,8 @@
 package klarlint
 
 type File struct {
-	*Config // Global configuration
-	Configs []*Config
+	*Config        // Global configuration
+	Configurations []*Config
 }
 
 type Config struct {
