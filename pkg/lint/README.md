@@ -7,7 +7,9 @@ Goals:
 
 ## External Linter API
 
-Linters don't have to be written in Klar (there is no analysis API for Klar yet). Type information about the project will be sent to linters as JSON.
+Linters don't have to be written in Klar (there is no compiler API for Klar yet). Type information about the project will be sent to linters from the Klar compiler as JSON. We will release Klar and JavaScript bindings that read the JSON.
+
+The protocol hasn't been decided yet. This includes whether they communicate over stdio (like the Language Server Protocol), the filesystem, HTTP, etc. Discussions on GitHub are [ongoing](<>).
 
 ## Future analysis APIs for linting
 

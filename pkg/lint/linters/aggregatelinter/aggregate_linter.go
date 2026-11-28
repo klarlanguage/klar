@@ -23,6 +23,7 @@ type AggregateLinter struct {
 }
 
 func (al *AggregateLinter) Linter() *lint.Linter {
+	rules := []lint.Rule{}
 	// Include the names and descriptions of each linter in the long description
 	var b strings.Builder
 	b.WriteString(al.LongDescription)
@@ -30,6 +31,9 @@ func (al *AggregateLinter) Linter() *lint.Linter {
 	sortByName := func(a, b *lint.Linter) int { return cmp.Compare(a.Name, b.Name) }
 	for _, l := range slices.SortedFunc(slices.Values(al.Linters), sortByName) {
 		fmt.Fprintf(&b, "\n  - %s - %s", l.Name, l.ShortDescription)
+		// TODO: Should the returned Linter's Rules point to the returned linter,
+		// or the linter where the rule actually came from?
+		rules = append(rules, l.Rules...)
 	}
 
 	return &lint.Linter{
@@ -38,9 +42,8 @@ func (al *AggregateLinter) Linter() *lint.Linter {
 		LongDescription:  b.String(),
 		DocsURL:          al.DocsURL,
 		Run:              al.run,
-		// TODO
-		Rules:    nil,
-		Settings: nil,
+		Rules:            rules,
+		Settings:         nil, // TODO
 	}
 }
 
