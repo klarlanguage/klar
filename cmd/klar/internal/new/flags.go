@@ -8,9 +8,8 @@ var Flags = argparse.NewParser("[dir]").
 		"executable": 2, "exec": 2, "cmd": 2, "command": 2,
 	}, "executable", "t").
 	StringFlag("name", "The name of the package (defaults to the directory's name)", "", "", "n").
-	BoolFlag("with-tests", "Add test templates to the project", false).
+	BoolFlag("with-tests", "Add test templates to the project", true).
 	BoolFlag("with-klarbuild", "Add a 'klar.build' configuration for the project", false).
-	BoolFlag("local-cache", "Add a '.klar' folder to the project to store installed packages and cache", false).
 	BoolFlag("git-init", "Initialize a new Git repository for the project", false).
 	BoolFlag("with-github-ci", "Create a GitHub Actions workflow to test and lint the project", false)
 
