@@ -50,7 +50,10 @@ func (p *Parser) Flag(name string) *Flag {
 	name = p.resolve(name)
 	f, ok := p.Flags[name]
 	if !ok {
-		return p.FlagDefs[name].Default
+		if def, ok := p.FlagDefs[name]; ok {
+			return def.Default
+		}
+		panic("unknown flag: " + name)
 	}
 	return f
 }
